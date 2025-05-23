@@ -1,10 +1,12 @@
 
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
+import AddOrderForm from "@/components/forms/AddOrderForm";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Filter } from "lucide-react";
 
 // Mock data for tarpaulin orders
@@ -45,6 +47,7 @@ const Orders = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [productFilter, setProductFilter] = useState("");
   const [customerFilter, setCustomerFilter] = useState("");
+  const [isAddOrderOpen, setIsAddOrderOpen] = useState(false);
 
   const tabs = [
     { id: "all", label: "All Orders" },
@@ -60,10 +63,15 @@ const Orders = () => {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Orders</h1>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Order
-          </Button>
+          <Dialog open={isAddOrderOpen} onOpenChange={setIsAddOrderOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Order
+              </Button>
+            </DialogTrigger>
+            <AddOrderForm onClose={() => setIsAddOrderOpen(false)} />
+          </Dialog>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm">
