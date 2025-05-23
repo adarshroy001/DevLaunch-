@@ -5,13 +5,13 @@ import StatsCard from "@/components/cards/StatsCard";
 import SearchBar from "@/components/ui/SearchBar";
 import { ShoppingCart, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 
-// Mock data for orders
+// Mock data for tarpaulin orders
 const MOCK_ORDERS = [
-  { id: "ORD123", customer: "John Doe", date: "2025-05-20", status: "Processing", total: "$246.00", items: 3 },
-  { id: "ORD124", customer: "Sarah Smith", date: "2025-05-20", status: "Shipped", total: "$189.50", items: 2 },
-  { id: "ORD125", customer: "Michael Johnson", date: "2025-05-20", status: "Completed", total: "$532.75", items: 7 },
-  { id: "ORD126", customer: "Emma Wilson", date: "2025-05-19", status: "Processing", total: "$78.25", items: 1 },
-  { id: "ORD127", customer: "Robert Brown", date: "2025-05-19", status: "Delayed", total: "$315.20", items: 4 }
+  { id: "ORD123", customer: "Construction Co. Ltd", date: "2025-05-20", status: "Processing", total: "₹24,600", items: "Heavy Duty Tarpaulin 20x30" },
+  { id: "ORD124", customer: "Warehouse Solutions", date: "2025-05-20", status: "Shipped", total: "₹18,950", items: "Waterproof Canvas 15x25" },
+  { id: "ORD125", customer: "Industrial Corp", date: "2025-05-20", status: "Completed", total: "₹53,275", items: "Custom Print Tarpaulin" },
+  { id: "ORD126", customer: "Farm Equipment Co", date: "2025-05-19", status: "Processing", total: "₹7,825", items: "Agricultural Cover 12x18" },
+  { id: "ORD127", customer: "Event Management Ltd", date: "2025-05-19", status: "Delayed", total: "₹31,520", items: "Fire Retardant Tarp 25x40" }
 ];
 
 const OrderStatusBadge = ({ status }: { status: string }) => {
@@ -47,7 +47,7 @@ const OrderBook = () => {
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold mb-6">Order Book</h1>
+        <h1 className="text-2xl font-bold mb-6">Tarpaulin Order Book</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <StatsCard 
@@ -57,7 +57,7 @@ const OrderBook = () => {
             iconColor="text-blue-100 bg-blue-500"
           />
           <StatsCard 
-            title="PROCESSING" 
+            title="IN PRODUCTION" 
             value="28"
             icon={Clock} 
             iconColor="text-amber-100 bg-amber-500"
@@ -84,7 +84,7 @@ const OrderBook = () => {
                   className={`px-3 py-1.5 text-sm rounded-md ${filter === 'processing' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   onClick={() => setFilter('processing')}
                 >
-                  Processing
+                  In Production
                 </button>
                 <button 
                   className={`px-3 py-1.5 text-sm rounded-md ${filter === 'completed' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
@@ -108,7 +108,7 @@ const OrderBook = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
