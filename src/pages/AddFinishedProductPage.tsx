@@ -1,0 +1,107 @@
+
+import Navbar from "@/components/layout/Navbar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+
+const AddFinishedProductPage = () => {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        <div className="mb-6">
+          <Button variant="outline" asChild>
+            <Link to="/inventory">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Inventory
+            </Link>
+          </Button>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Add Finished Product</CardTitle>
+            <CardDescription>
+              Add new finished products like rolls or bundles to the inventory.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="rolls" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="rolls">Add Rolls</TabsTrigger>
+                <TabsTrigger value="bundles">Add Bundles</TabsTrigger>
+              </TabsList>
+              <TabsContent value="rolls">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Add Rolls</CardTitle>
+                    <CardDescription>Enter details for the tarpaulin rolls.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="rollName">Product Name/Type</Label>
+                      <Input id="rollName" placeholder="e.g., Heavy Duty Tarpaulin Blue" />
+                    </div>
+                    <div>
+                      <Label htmlFor="rollWidth">Width (e.g., meters/feet)</Label>
+                      <Input id="rollWidth" type="number" placeholder="e.g., 2" />
+                    </div>
+                    <div>
+                      <Label htmlFor="rollQuantity">Quantity of Rolls</Label>
+                      <Input id="rollQuantity" type="number" placeholder="e.g., 10" />
+                    </div>
+                     <div>
+                      <Label htmlFor="rollUnit">Unit for Quantity</Label>
+                      <Input id="rollUnit" defaultValue="pieces" placeholder="e.g., pieces" />
+                    </div>
+                    <div>
+                      <Label htmlFor="rollLength">Length per Roll (e.g., meters/feet)</Label>
+                      <Input id="rollLength" type="number" placeholder="e.g., 50" />
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full">Add Rolls</Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+              <TabsContent value="bundles">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Add Bundles</CardTitle>
+                    <CardDescription>Enter details for the tarpaulin bundles.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                     <div>
+                      <Label htmlFor="bundleName">Product Name/Type</Label>
+                      <Input id="bundleName" placeholder="e.g., Standard Tarpaulin Pack" />
+                    </div>
+                    <div>
+                      <Label htmlFor="bundleSize">Size (e.g., 10x12 ft)</Label>
+                      <Input id="bundleSize" placeholder="e.g., 10x12 ft" />
+                    </div>
+                    <div>
+                      <Label htmlFor="bundleQuantity">Quantity of Bundles</Label>
+                      <Input id="bundleQuantity" type="number" placeholder="e.g., 50" />
+                    </div>
+                     <div>
+                      <Label htmlFor="itemsPerBundle">Items per Bundle</Label>
+                      <Input id="itemsPerBundle" type="number" placeholder="e.g., 5" />
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full">Add Bundles</Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default AddFinishedProductPage;

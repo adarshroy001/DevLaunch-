@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import StatsCard from "@/components/cards/StatsCard";
 import SearchBar from "@/components/ui/SearchBar";
 import AlertCard from "@/components/ui/AlertCard";
+import { Button } from "@/components/ui/button";
 import { Boxes, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Mock data for tarpaulin inventory
 const MOCK_INVENTORY = [
@@ -38,6 +39,7 @@ const StockStatusBadge = ({ status }: { status: string }) => {
 
 const Inventory = () => {
   const [category, setCategory] = useState("all");
+  const navigate = useNavigate();
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -86,18 +88,30 @@ const Inventory = () => {
           <div className="bg-white p-6 rounded-md shadow-sm">
             <h2 className="text-lg font-medium mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm">
+              <Button 
+                className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                onClick={() => navigate('/inventory/add-raw-material')}
+              >
                 Add Raw Material
-              </button>
-              <button className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors text-sm">
-                Update Stock Levels
-              </button>
-              <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors text-sm">
+              </Button>
+              <Button 
+                className="w-full bg-green-600 text-white hover:bg-green-700"
+                onClick={() => navigate('/inventory/add-finished-product')}
+              >
+                Add Finished Product
+              </Button>
+              <Button 
+                className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                onClick={() => navigate('/inventory/generate-report')}
+              >
                 Generate Inventory Report
-              </button>
-              <button className="w-full bg-amber-600 text-white py-2 px-4 rounded hover:bg-amber-700 transition-colors text-sm">
-                Reorder Alerts
-              </button>
+              </Button>
+              <Button 
+                className="w-full bg-amber-600 text-white hover:bg-amber-700"
+                onClick={() => navigate('/inventory/low-stock-alerts')}
+              >
+                Low Stock Alerts
+              </Button>
             </div>
           </div>
         </div>

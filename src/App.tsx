@@ -9,8 +9,12 @@ import Orders from "./pages/Orders";
 import OrderBook from "./pages/OrderBook";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import Inventory from "./pages/Inventory";
+import AddRawMaterialPage from "./pages/AddRawMaterialPage"; // New import
+import AddFinishedProductPage from "./pages/AddFinishedProductPage"; // New import
+import InventoryReportPage from "./pages/InventoryReportPage"; // New import
+import LowStockAlertsPage from "./pages/LowStockAlertsPage"; // New import
 import Dispatch from "./pages/Dispatch";
-import CreateShipmentPage from "./pages/CreateShipmentPage"; // Added import
+import CreateShipmentPage from "./pages/CreateShipmentPage";
 import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -29,8 +33,12 @@ const App = () => (
           <Route path="/orderbook" element={<OrderBook />} />
           <Route path="/orderbook/:orderId" element={<OrderDetailsPage />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/inventory/add-raw-material" element={<AddRawMaterialPage />} /> {/* New route */}
+          <Route path="/inventory/add-finished-product" element={<AddFinishedProductPage />} /> {/* New route */}
+          <Route path="/inventory/generate-report" element={<InventoryReportPage />} /> {/* New route */}
+          <Route path="/inventory/low-stock-alerts" element={<LowStockAlertsPage />} /> {/* New route */}
           <Route path="/dispatch" element={<Dispatch />} />
-          <Route path="/create-shipment" element={<CreateShipmentPage />} /> {/* Added route */}
+          <Route path="/create-shipment" element={<CreateShipmentPage />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
