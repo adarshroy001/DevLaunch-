@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import AddOrderForm from "@/components/forms/AddOrderForm";
@@ -8,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Filter } from "lucide-react";
+import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
 
 // Mock data for tarpaulin orders
 const MOCK_ORDERS = [
@@ -17,29 +17,6 @@ const MOCK_ORDERS = [
   { id: "ORD126", customer: "Emma Wilson", product: "Custom Print Tarpaulin 12x18", quantity: 1, date: "2025-05-19", status: "Pending" },
   { id: "ORD127", customer: "Robert Brown", product: "Fire Retardant Tarp 25x40", quantity: 4, date: "2025-05-19", status: "Cancelled" }
 ];
-
-const OrderStatusBadge = ({ status }: { status: string }) => {
-  const getStatusStyles = () => {
-    switch (status) {
-      case "Pending":
-        return "bg-amber-100 text-amber-800";
-      case "Dispatched":
-        return "bg-blue-100 text-blue-800";
-      case "Completed":
-        return "bg-green-100 text-green-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyles()}`}>
-      {status}
-    </span>
-  );
-};
 
 const Orders = () => {
   const [activeTab, setActiveTab] = useState("all");

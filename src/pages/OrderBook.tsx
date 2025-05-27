@@ -1,43 +1,11 @@
-
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import StatsCard from "@/components/cards/StatsCard";
 import SearchBar from "@/components/ui/SearchBar";
-import { ShoppingCart, Clock, CheckCircle, AlertTriangle } from "lucide-react";
-
-// Mock data for tarpaulin orders
-const MOCK_ORDERS = [
-  { id: "ORD123", customer: "Construction Co. Ltd", date: "2025-05-20", status: "Processing", total: "₹24,600", items: "Heavy Duty Tarpaulin 20x30" },
-  { id: "ORD124", customer: "Warehouse Solutions", date: "2025-05-20", status: "Shipped", total: "₹18,950", items: "Waterproof Canvas 15x25" },
-  { id: "ORD125", customer: "Industrial Corp", date: "2025-05-20", status: "Completed", total: "₹53,275", items: "Custom Print Tarpaulin" },
-  { id: "ORD126", customer: "Farm Equipment Co", date: "2025-05-19", status: "Processing", total: "₹7,825", items: "Agricultural Cover 12x18" },
-  { id: "ORD127", customer: "Event Management Ltd", date: "2025-05-19", status: "Delayed", total: "₹31,520", items: "Fire Retardant Tarp 25x40" }
-];
-
-const OrderStatusBadge = ({ status }: { status: string }) => {
-  const getStatusStyles = () => {
-    switch (status) {
-      case "Processing":
-        return "bg-blue-100 text-blue-800";
-      case "Shipped":
-        return "bg-purple-100 text-purple-800";
-      case "Completed":
-        return "bg-green-100 text-green-800";
-      case "Delayed":
-        return "bg-amber-100 text-amber-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyles()}`}>
-      {status}
-    </span>
-  );
-};
+import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
+import { orderBookMockOrders } from "@/data/orderBookMockData";
+import { ShoppingCart, Clock, CheckCircle } from "lucide-react";
 
 const OrderBook = () => {
   const [filter, setFilter] = useState("all");
@@ -113,7 +81,7 @@ const OrderBook = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {MOCK_ORDERS.map((order) => (
+                {orderBookMockOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{order.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.customer}</td>
@@ -124,7 +92,9 @@ const OrderBook = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.total}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.items}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900">View</button>
+                      <Link to={`/orderbook/${order.id}`} className="text-blue-600 hover:text-blue-900">
+                        View
+                      </Link>
                     </td>
                   </tr>
                 ))}
@@ -134,7 +104,7 @@ const OrderBook = () => {
           
           <div className="px-6 py-4 border-t">
             <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-700">Showing 5 of 45 orders</p>
+              <p className="text-sm text-gray-700">Showing {orderBookMockOrders.length} of {orderBookMockOrders.length} orders</p>
               <div className="flex space-x-2">
                 <button className="px-3 py-1 border rounded text-sm bg-white hover:bg-gray-50">Previous</button>
                 <button className="px-3 py-1 border rounded text-sm bg-blue-600 text-white hover:bg-blue-700">Next</button>

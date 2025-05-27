@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Orders from "./pages/Orders";
 import OrderBook from "./pages/OrderBook";
+import OrderDetailsPage from "./pages/OrderDetailsPage";
 import Inventory from "./pages/Inventory";
 import Dispatch from "./pages/Dispatch";
 import Reports from "./pages/Reports";
@@ -25,11 +25,11 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orderbook" element={<OrderBook />} />
+          <Route path="/orderbook/:orderId" element={<OrderDetailsPage />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/dispatch" element={<Dispatch />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/admin" element={<Admin />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
