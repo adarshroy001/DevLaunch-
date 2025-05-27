@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import StatsCard from "@/components/cards/StatsCard";
 import SearchBar from "@/components/ui/SearchBar";
-import { Truck, Package, CheckCircle, AlertTriangle } from "lucide-react";
+import { Truck, Package, CheckCircle, AlertTriangle, Info } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Mock data for dispatch
 const MOCK_DISPATCH = [
@@ -39,6 +39,7 @@ const DispatchStatusBadge = ({ status }: { status: string }) => {
 
 const Dispatch = () => {
   const [filter, setFilter] = useState("all");
+  const todayDispatchInfo = MOCK_DISPATCH.slice(0, 4); // Taking first 4 for display
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -77,44 +78,39 @@ const Dispatch = () => {
         <div className="bg-white rounded-md shadow-sm mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
             <div>
-              <h2 className="text-lg font-medium mb-4">Today's Pickup Schedule</h2>
+              <h2 className="text-lg font-medium mb-4">Today's Dispatch Status</h2>
               <div className="space-y-3">
-                <div className="flex items-center p-3 bg-blue-50 rounded-md border border-blue-100">
-                  <div className="flex-shrink-0 mr-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium">10:00</div>
-                  </div>
-                  <div>
-                    <p className="font-medium">FedEx</p>
-                    <p className="text-sm text-gray-500">4 packages</p>
-                  </div>
-                </div>
-                <div className="flex items-center p-3 bg-purple-50 rounded-md border border-purple-100">
-                  <div className="flex-shrink-0 mr-3">
-                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-medium">13:30</div>
-                  </div>
-                  <div>
-                    <p className="font-medium">UPS</p>
-                    <p className="text-sm text-gray-500">2 packages</p>
-                  </div>
-                </div>
-                <div className="flex items-center p-3 bg-green-50 rounded-md border border-green-100">
-                  <div className="flex-shrink-0 mr-3">
-                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-medium">16:00</div>
-                  </div>
-                  <div>
-                    <p className="font-medium">USPS</p>
-                    <p className="text-sm text-gray-500">3 packages</p>
-                  </div>
-                </div>
+                {todayDispatchInfo.length > 0 ? (
+                  todayDispatchInfo.map((dispatchItem) => (
+                    <div key={dispatchItem.id} className="flex items-center p-3 bg-gray-50 rounded-md border border-gray-200">
+                      <div className="flex-shrink-0 mr-3">
+                        <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
+                          <Info size={16} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">{dispatchItem.customer}</p>
+                        <div className="text-sm text-gray-600">
+                          Order {dispatchItem.orderId}: <DispatchStatusBadge status={dispatchItem.status} />
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No dispatch information for today.</p>
+                )}
               </div>
             </div>
             
             <div>
               <h2 className="text-lg font-medium mb-4">Quick Actions</h2>
               <div className="space-y-3">
-                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm">
+                <Link
+                  to="/create-shipment"
+                  className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm"
+                >
                   Create New Shipment
-                </button>
+                </Link>
                 <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors text-sm">
                   Print Shipping Labels
                 </button>
