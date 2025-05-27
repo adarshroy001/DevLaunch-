@@ -67,6 +67,8 @@ const CreateShipmentPage = () => {
                       selected={loadingDate}
                       onSelect={setLoadingDate}
                       initialFocus
+                      // Ensure calendar is interactive as per shadcn-datepicker context
+                      className={cn("p-3 pointer-events-auto")} 
                     />
                   </PopoverContent>
                 </Popover>
@@ -116,6 +118,11 @@ const CreateShipmentPage = () => {
             <div className="space-y-2">
               <Label htmlFor="transportation">Transportation (Optional)</Label>
               <Input id="transportation" placeholder="e.g., Self pickup, Third-party logistics" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="shipmentRemarks">Remarks (Optional)</Label>
+              <Textarea id="shipmentRemarks" placeholder="Enter any additional notes for the shipment" />
             </div>
           </CardContent>
           <CardFooter>

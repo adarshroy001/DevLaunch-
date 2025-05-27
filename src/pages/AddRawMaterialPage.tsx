@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea"; // Added Textarea import
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -47,6 +48,10 @@ const AddRawMaterialPage = () => {
             <div>
               <Label htmlFor="price">Price per Unit</Label>
               <Input id="price" type="number" placeholder="e.g., 50.00" />
+            </div>
+            <div>
+              <Label htmlFor="remarks">Remarks (Optional)</Label>
+              <Textarea id="remarks" placeholder="Enter any additional notes or remarks" />
             </div>
             <Button className="w-full">Add Raw Material</Button>
           </CardContent>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea"; // Added Textarea import
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -61,6 +62,10 @@ const AddFinishedProductPage = () => {
                       <Label htmlFor="rollLength">Length per Roll (e.g., meters/feet)</Label>
                       <Input id="rollLength" type="number" placeholder="e.g., 50" />
                     </div>
+                    <div>
+                      <Label htmlFor="rollRemarks">Remarks (Optional)</Label>
+                      <Textarea id="rollRemarks" placeholder="Enter any additional notes for rolls" />
+                    </div>
                   </CardContent>
                   <CardFooter>
                     <Button className="w-full">Add Rolls</Button>
@@ -89,6 +94,10 @@ const AddFinishedProductPage = () => {
                      <div>
                       <Label htmlFor="itemsPerBundle">Items per Bundle</Label>
                       <Input id="itemsPerBundle" type="number" placeholder="e.g., 5" />
+                    </div>
+                    <div>
+                      <Label htmlFor="bundleRemarks">Remarks (Optional)</Label>
+                      <Textarea id="bundleRemarks" placeholder="Enter any additional notes for bundles" />
                     </div>
                   </CardContent>
                   <CardFooter>
