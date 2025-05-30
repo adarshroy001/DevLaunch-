@@ -4,6 +4,7 @@ import StatsCard from "@/components/cards/StatsCard";
 import SearchBar from "@/components/ui/SearchBar";
 import { Truck, Package, CheckCircle, AlertTriangle, Info } from "lucide-react";
 import { Link } from "react-router-dom";
+import AddRemark from "@/components/remark/remark";
 
 // Mock data for dispatch
 const MOCK_DISPATCH = [
@@ -190,6 +191,7 @@ const Dispatch = () => {
             </div>
           </div>
         </div>
+        <AddRemark/>
       </div>
     </div>
   );

@@ -161,14 +161,22 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
         <div className="border rounded-lg p-6 bg-gray-50">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-700">Items Specifications</h3>
-            <Button 
-              type="button" 
-              onClick={addItemRow}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Add Item
-            </Button>
+          
+            <div className="px-3 py-1 text-sm">
+              <Label htmlFor="salesPerson" className="text-sm font-medium text-gray-600 text-center mx-3">Add Item</Label>
+              <Select value={formData.salesPerson} onValueChange={(value) => handleInputChange("salesPerson", value)}>
+                <SelectTrigger className="mt-1 mr-2 text-center">
+                  <SelectValue placeholder="Add item from here" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Premium">Premium Tarp</SelectItem>
+                  <SelectItem value="Heavy">Heavy Duty</SelectItem>
+                  <SelectItem value="Waterproof">Waterproof Pro</SelectItem>
+                  <SelectItem value="Industrial">Industrial Grade</SelectItem>
+                  <SelectItem value="Custom">Custom Brand</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           
           {itemRows.map((row, index) => (
@@ -224,14 +232,29 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
         <div className="border rounded-lg p-6 bg-gray-50">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-700">Dimensions & Quantity</h3>
-            <Button 
+            {/* <Button 
               type="button" 
               onClick={addDimensionRow}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm"
             >
               <Plus className="w-4 h-4 mr-1" />
               Add Row
-            </Button>
+            </Button> */}
+            <div className="px-3 py-1 text-sm">
+              <Label htmlFor="salesPerson" className="text-sm font-medium text-gray-600 text-center mx-3">Add Item</Label>
+              <Select value={formData.salesPerson} onValueChange={(value) => handleInputChange("salesPerson", value)}>
+                <SelectTrigger className="mt-1 mr-2 text-center">
+                  <SelectValue placeholder="Add item from here" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Premium">Premium Tarp</SelectItem>
+                  <SelectItem value="Heavy">Heavy Duty</SelectItem>
+                  <SelectItem value="Waterproof">Waterproof Pro</SelectItem>
+                  <SelectItem value="Industrial">Industrial Grade</SelectItem>
+                  <SelectItem value="Custom">Custom Brand</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           
           {dimensionRows.map((row, index) => (
@@ -308,10 +331,8 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
                   <SelectValue placeholder="Select transport" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="own">Own Transport</SelectItem>
-                  <SelectItem value="courier">Courier</SelectItem>
-                  <SelectItem value="freight">Freight</SelectItem>
-                  <SelectItem value="pickup">Customer Pickup</SelectItem>
+                  <SelectItem value="name">Transport name</SelectItem>
+                  <SelectItem value="number">Transport number</SelectItem>
                 </SelectContent>
               </Select>
             </div>

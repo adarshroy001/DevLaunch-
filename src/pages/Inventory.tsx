@@ -6,6 +6,7 @@ import AlertCard from "@/components/ui/AlertCard";
 import { Button } from "@/components/ui/button";
 import { Boxes, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import AddRemark from "@/components/remark/remark";
 
 // Mock data for tarpaulin inventory
 const MOCK_INVENTORY = [
@@ -186,6 +187,7 @@ const Inventory = () => {
             </div>
           </div>
         </div>
+      <AddRemark/>
       </div>
     </div>
   );
