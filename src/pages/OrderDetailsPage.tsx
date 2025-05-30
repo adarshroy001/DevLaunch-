@@ -94,10 +94,6 @@ const OrderDetailsPage = () => {
               </div>
             </div>
             <div>
-              <Label>Total Amount</Label>
-              <p className="text-lg font-semibold">{order.total}</p>
-            </div>
-            <div>
               <Label>Product Details</Label>
               <p>{order.items}</p>
             </div>

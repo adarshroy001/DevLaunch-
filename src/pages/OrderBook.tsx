@@ -75,7 +75,6 @@ const OrderBook = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -89,7 +88,6 @@ const OrderBook = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <OrderStatusBadge status={order.status} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.total}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.items}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link to={`/orderbook/${order.id}`} className="text-blue-600 hover:text-blue-900">
