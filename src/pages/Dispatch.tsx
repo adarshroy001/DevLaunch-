@@ -44,39 +44,39 @@ const Dispatch = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold mb-6">Dispatch</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <StatsCard 
-            title="TODAY'S DISPATCHES" 
+          <StatsCard
+            title="TODAY'S DISPATCHES"
             value="8"
             icon={Truck}
             iconColor="text-blue-100 bg-blue-500"
           />
-          <StatsCard 
-            title="PENDING SHIPMENTS" 
+          <StatsCard
+            title="PENDING SHIPMENTS"
             value="12"
             icon={Package}
             iconColor="text-amber-100 bg-amber-500"
           />
-          <StatsCard 
-            title="DELIVERED TODAY" 
+          <StatsCard
+            title="DELIVERED TODAY"
             value="5"
             icon={CheckCircle}
-            iconColor="text-green-100 bg-green-500" 
+            iconColor="text-green-100 bg-green-500"
           />
-          <StatsCard 
-            title="DELAYED SHIPMENTS" 
+          <StatsCard
+            title="DELAYED SHIPMENTS"
             value="2"
             icon={AlertTriangle}
-            iconColor="text-red-100 bg-red-500" 
+            iconColor="text-red-100 bg-red-500"
           />
         </div>
 
         <div className="bg-white rounded-md shadow-sm mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+          <div className="p-6">
             <div>
               <h2 className="text-lg font-medium mb-4">Today's Dispatch Status</h2>
               <div className="space-y-3">
@@ -101,59 +101,49 @@ const Dispatch = () => {
                 )}
               </div>
             </div>
-            
-            <div>
-              <h2 className="text-lg font-medium mb-4">Quick Actions</h2>
-              <div className="space-y-3">
-                <Link
-                  to="/create-shipment"
-                  className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm"
-                >
-                  Create New Shipment
-                </Link>
-                <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors text-sm">
-                  Print Shipping Labels
-                </button>
-                <button className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors text-sm">
-                  Schedule Pickup
-                </button>
-                <button className="w-full border border-gray-300 bg-white text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors text-sm">
-                  View Shipping Rates
-                </button>
-              </div>
-            </div>
+
           </div>
         </div>
-        
+
         <div className="bg-white rounded-md shadow-sm">
           <div className="p-6 border-b">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
               <div className="flex space-x-4">
-                <button 
+                <button
                   className={`px-3 py-1.5 text-sm rounded-md ${filter === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   onClick={() => setFilter('all')}
                 >
                   All Shipments
                 </button>
-                <button 
+                <button
                   className={`px-3 py-1.5 text-sm rounded-md ${filter === 'transit' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   onClick={() => setFilter('transit')}
                 >
                   In Transit
                 </button>
-                <button 
+                <button
                   className={`px-3 py-1.5 text-sm rounded-md ${filter === 'delivered' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   onClick={() => setFilter('delivered')}
                 >
                   Delivered
                 </button>
               </div>
-              <div className="w-full sm:w-auto">
-                <SearchBar placeholder="Search shipments..." className="w-full sm:w-64" />
+              <div className="flex gap-5 justify-center items-center">
+                <div>
+                  <Link
+                    to="/create-shipment"
+                    className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    Create New Challan
+                  </Link>
+                </div>
+                <div className="w-full sm:w-auto">
+                  <SearchBar placeholder="Search shipments..." className="w-full sm:w-64" />
+                </div>
               </div>
             </div>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -189,7 +179,7 @@ const Dispatch = () => {
               </tbody>
             </table>
           </div>
-          
+
           <div className="px-6 py-4 border-t">
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-700">Showing 5 of 42 shipments</p>
