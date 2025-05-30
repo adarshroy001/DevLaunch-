@@ -151,7 +151,7 @@ const Orders = () => {
                     <TableCell className="font-medium text-blue-600">{order.id}</TableCell>
                     <TableCell>{order.customer}</TableCell>
                     <TableCell>{order.product}</TableCell>
-                    <TableCell>{order.quantity}</TableCell>
+                    <TableCell className="pl-10">{order.quantity}</TableCell>
                     <TableCell className="text-gray-500">{order.date}</TableCell>
                     <TableCell>
                       <OrderStatusBadge status={order.status} />
