@@ -8,7 +8,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Filter } from "lucide-react";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
-import RemarksComponent from "@/components/remark/remark";
 import { Link } from "react-router-dom";
 
 // Mock data for tarpaulin orders
