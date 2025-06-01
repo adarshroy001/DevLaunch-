@@ -6,9 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea"; // Added Textarea import
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const AddRawMaterialPage = () => {
+  const [gstRate, setGstRate] = useState(0);
+  const [Price, setPrice] = useState(0);
+  // Convert gstRate to a number and calculate total
+  const totalPerUnit = Price +  Price*gstRate/100 ;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -39,7 +45,7 @@ const AddRawMaterialPage = () => {
             </div>
             <div>
               <Label htmlFor="quantity">Quantity</Label>
-              <Input id="quantity" type="number" placeholder="e.g., 100" />
+              <Input id="quantity" type="number" placeholder="e.g., 100" min="0" />
             </div>
             <div>
               <Label htmlFor="unit">Unit</Label>
@@ -47,7 +53,15 @@ const AddRawMaterialPage = () => {
             </div>
             <div>
               <Label htmlFor="price">Price per Unit</Label>
-              <Input id="price" type="number" placeholder="e.g., 50.00" />
+              <Input id="price" type="number" min="0" placeholder="e.g., 50.00" value={Price} onChange={(e) => setPrice(Number(e.target.value))} />
+            </div>
+            <div>
+              <Label htmlFor="GST">GST Rate</Label>
+              <Input id="gstRate" type="number" min="0" placeholder="e.g., 18 for 18%" value={gstRate} onChange={(e) => setGstRate(Number(e.target.value))} />
+            </div>
+            <div>
+              <Label htmlFor="totalAmount">Total amount per unit</Label>
+              <Input id="totalAmount" type="number" min="0" value={totalPerUnit} readOnly />
             </div>
             <div>
               <Label htmlFor="remarks">Remarks (Optional)</Label>
