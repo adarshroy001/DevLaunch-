@@ -9,6 +9,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Filter } from "lucide-react";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
 import RemarksComponent from "@/components/remark/remark";
+import { Link } from "react-router-dom";
 
 // Mock data for tarpaulin orders
 const MOCK_ORDERS = [
@@ -37,7 +38,7 @@ const Orders = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Orders</h1>
@@ -60,11 +61,10 @@ const Orders = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
                       ? "border-blue-500 text-blue-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   {tab.label}
                 </button>
@@ -144,6 +144,7 @@ const Orders = () => {
                   <TableHead className="w-24">QUANTITY</TableHead>
                   <TableHead className="w-32">DATE</TableHead>
                   <TableHead className="w-32">STATUS</TableHead>
+                  <TableHead className="w-32">ACTIONS</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -156,6 +157,11 @@ const Orders = () => {
                     <TableCell className="text-gray-500">{order.date}</TableCell>
                     <TableCell>
                       <OrderStatusBadge status={order.status} />
+                    </TableCell>
+                    <TableCell>
+                      <Link to={`/orderbook/${order.id}`} className="text-blue-600 hover:text-blue-900 text-center px-4">
+                        View
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -174,7 +180,6 @@ const Orders = () => {
             </div>
           </div>
         </div>
-        <RemarksComponent/>
       </div>
     </div>
   );
