@@ -14,15 +14,15 @@ import { useState } from "react";
 const AddFinishedProductPage = () => {
   //handling inputs
   const [itemFormData, setItemFormData] = useState({
-      ProductName: "",
-      gsm: "",
-      colourTop: "",
-      colourBottom: "",
-      width: "",
-      quantity: "",
-      weight: "",
-      remarks: ""
-    });
+    ProductName: "",
+    gsm: "",
+    colourTop: "",
+    colourBottom: "",
+    width: "",
+    quantity: "",
+    weight: "",
+    remarks: ""
+  });
   const handleItemInputChange = (field: string, value: string) => {
     setItemFormData(prev => ({
       ...prev,
@@ -70,45 +70,56 @@ const AddFinishedProductPage = () => {
                       <Label >GSM</Label>
                       <Input placeholder="e.g., 120, 150, 180" className="mt-1" />
                     </div>
-                    <div>
-                      <Label >Colour Top</Label>
-                      <Select value={itemFormData.colourTop} onValueChange={(value) => handleItemInputChange("colourTop", value)}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select top colour" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="blue">Blue</SelectItem>
-                          <SelectItem value="green">Green</SelectItem>
-                          <SelectItem value="red">Red</SelectItem>
-                          <SelectItem value="white">White</SelectItem>
-                          <SelectItem value="black">Black</SelectItem>
-                          <SelectItem value="yellow">Yellow</SelectItem>
-                          <SelectItem value="orange">Orange</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    {/* colours */}
+                    <div className="flex justify-between">
+                      <div className="w-2/5">
+                        <Label >Colour Top</Label>
+                        <Select value={itemFormData.colourTop} onValueChange={(value) => handleItemInputChange("colourTop", value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select top colour" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="blue">Blue</SelectItem>
+                            <SelectItem value="green">Green</SelectItem>
+                            <SelectItem value="red">Red</SelectItem>
+                            <SelectItem value="white">White</SelectItem>
+                            <SelectItem value="black">Black</SelectItem>
+                            <SelectItem value="yellow">Yellow</SelectItem>
+                            <SelectItem value="orange">Orange</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="w-2/5">
+                        <Label>Colour Bottom</Label>
+                        <Select value={itemFormData.colourBottom} onValueChange={(value) => handleItemInputChange("colourBottom", value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select bottom colour" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="blue">Blue</SelectItem>
+                            <SelectItem value="green">Green</SelectItem>
+                            <SelectItem value="red">Red</SelectItem>
+                            <SelectItem value="white">White</SelectItem>
+                            <SelectItem value="black">Black</SelectItem>
+                            <SelectItem value="yellow">Yellow</SelectItem>
+                            <SelectItem value="orange">Orange</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    {/* Wdth and wt */}
+                    <div className="flex justify-between">
+                      <div className="w-2/5">
+                        <Label htmlFor="rollWidth">Width (In)</Label>
+                        <Input id="rollWidth" type="number" placeholder="e.g., 2" min={0} />
+                      </div>
+                      <div className="w-2/5">
+                        <Label htmlFor="rollWeight">Weigth (Kg)</Label>
+                        <Input id="rollWeight" type="number" placeholder="e.g., 7" min={0} />
+                      </div>
                     </div>
 
-                    <div>
-                      <Label>Colour Bottom</Label>
-                      <Select value={itemFormData.colourBottom} onValueChange={(value) => handleItemInputChange("colourBottom", value)}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select bottom colour" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="blue">Blue</SelectItem>
-                          <SelectItem value="green">Green</SelectItem>
-                          <SelectItem value="red">Red</SelectItem>
-                          <SelectItem value="white">White</SelectItem>
-                          <SelectItem value="black">Black</SelectItem>
-                          <SelectItem value="yellow">Yellow</SelectItem>
-                          <SelectItem value="orange">Orange</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="rollWidth">Width (e.g., In)</Label>
-                      <Input id="rollWidth" type="number" placeholder="e.g., 2" min={0} />
-                    </div>
                     <div>
                       <Label htmlFor="rollQuantity">Quantity of Rolls</Label>
                       <Input id="rollQuantity" type="number" placeholder="e.g., 10" min={0} />
@@ -135,16 +146,71 @@ const AddFinishedProductPage = () => {
                       <Input id="bundleName" placeholder="e.g., Standard Tarpaulin Pack" />
                     </div>
                     <div>
-                      <Label htmlFor="bundleSize">Size (e.g., 10x12 ft)</Label>
-                      <Input id="bundleSize" placeholder="e.g., 10x12 ft" />
+                      <Label >GSM</Label>
+                      <Input placeholder="e.g., 120, 150, 180" className="mt-1" />
                     </div>
+                    {/* colour */}
+                    <div className="flex justify-between">
+                      <div className="w-2/5">
+                        <Label >Colour Top</Label>
+                        <Select value={itemFormData.colourTop} onValueChange={(value) => handleItemInputChange("colourTop", value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select top colour" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="blue">Blue</SelectItem>
+                            <SelectItem value="green">Green</SelectItem>
+                            <SelectItem value="red">Red</SelectItem>
+                            <SelectItem value="white">White</SelectItem>
+                            <SelectItem value="black">Black</SelectItem>
+                            <SelectItem value="yellow">Yellow</SelectItem>
+                            <SelectItem value="orange">Orange</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="w-2/5">
+                        <Label>Colour Bottom</Label>
+                        <Select value={itemFormData.colourBottom} onValueChange={(value) => handleItemInputChange("colourBottom", value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select bottom colour" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="blue">Blue</SelectItem>
+                            <SelectItem value="green">Green</SelectItem>
+                            <SelectItem value="red">Red</SelectItem>
+                            <SelectItem value="white">White</SelectItem>
+                            <SelectItem value="black">Black</SelectItem>
+                            <SelectItem value="yellow">Yellow</SelectItem>
+                            <SelectItem value="orange">Orange</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* dimensions of bundle */}
+                    <div className="flex justify-between">
+                      <div>
+                        <Label htmlFor="length">Length (ft)</Label>
+                        <Input id="length" placeholder="e.g., 10 ft" />
+                      </div>
+                      <div>
+                        <Label htmlFor="width">Width (ft)</Label>
+                        <Input id="bundleSize" placeholder="e.g., 10x12 ft" />
+                      </div>
+                      <div>
+                        <Label htmlFor="weight">Weight (Kg)</Label>
+                        <Input id="weight" placeholder="e.g., 10 Kg" />
+                      </div>
+                    </div>
+
                     <div>
                       <Label htmlFor="bundleQuantity">Quantity of Bundles</Label>
-                      <Input id="bundleQuantity" type="number" placeholder="e.g., 50" />
+                      <Input id="bundleQuantity" type="number" placeholder="e.g., 50" min={0} />
                     </div>
                     <div>
-                      <Label htmlFor="itemsPerBundle">Items per Bundle</Label>
-                      <Input id="itemsPerBundle" type="number" placeholder="e.g., 5" />
+                      <Label htmlFor="itemsPerBundle">Pieces per Bundle</Label>
+                      <Input id="itemsPerBundle" type="number" placeholder="e.g., 5" min={0} />
                     </div>
                     <div>
                       <Label htmlFor="bundleRemarks">Remarks (Optional)</Label>
