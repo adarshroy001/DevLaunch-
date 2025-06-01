@@ -191,7 +191,6 @@ const Dispatch = () => {
             </div>
           </div>
         </div>
-        <AddRemark/>
       </div>
     </div>
   );

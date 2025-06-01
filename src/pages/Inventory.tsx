@@ -187,7 +187,6 @@ const Inventory = () => {
             </div>
           </div>
         </div>
-      <AddRemark/>
       </div>
     </div>
   );
