@@ -108,16 +108,7 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
     <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle className="text-xl font-semibold">Add New Tarpaulin Order</DialogTitle>
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="sm"
-          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
-        >
-          <X className="w-5 h-5 text-gray-500" />
-        </Button>
-      </DialogHeader>
-      
+      </DialogHeader>   
       <div className="space-y-6 px-1">
         {/* Customer Information */}
         <div className="border rounded-lg p-6 bg-gray-50">
