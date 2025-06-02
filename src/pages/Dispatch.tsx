@@ -172,8 +172,8 @@ const Dispatch = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{dispatch.carrier}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">{dispatch.tracking}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">Track</button>
-                      <button className="text-gray-600 hover:text-gray-900">Print</button>
+                      <button className="text-blue-600 hover:text-blue-900 mr-4">View</button>
+                       {/* //removed Track Print */}
                     </td>
                   </tr>
                 ))}
