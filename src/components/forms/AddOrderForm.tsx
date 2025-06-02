@@ -17,13 +17,15 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
     brand: "",
     xFactory: false,
     forDelivery: false,
-    transport: ""
+    transport: false,
+    transportName: "",
+    transportContact: ""
   });
 
   const [items, setItems] = useState<any[]>([]);
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
-  
+
   const [itemFormData, setItemFormData] = useState({
     itemName: "",
     gsm: "",
@@ -42,6 +44,23 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleDeliveryChange = (selectedField: string, checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    
+    if (isChecked) {
+      // If checking a box, uncheck all others
+      setFormData(prev => ({
+        ...prev,
+        xFactory: selectedField === "xFactory",
+        forDelivery: selectedField === "forDelivery",
+        transport: selectedField === "transport"
+      }));
+    } else {
+      // If unchecking, just uncheck the selected field
+      handleInputChange(selectedField, false);
+    }
   };
 
   const handleItemInputChange = (field: string, value: string) => {
@@ -85,14 +104,14 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
   const handleItemSubmit = () => {
     if (editingItemIndex !== null) {
       // Edit existing item
-      setItems(prev => prev.map((item, index) => 
+      setItems(prev => prev.map((item, index) =>
         index === editingItemIndex ? { ...itemFormData } : item
       ));
     } else {
       // Add new item
       setItems(prev => [...prev, { ...itemFormData }]);
     }
-    
+
     setIsItemDialogOpen(false);
     resetItemForm();
     setEditingItemIndex(null);
@@ -108,7 +127,7 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
     <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle className="text-xl font-semibold">Add New Tarpaulin Order</DialogTitle>
-      </DialogHeader>   
+      </DialogHeader>
       <div className="space-y-6 px-1">
         {/* Customer Information */}
         <div className="border rounded-lg p-6 bg-gray-50">
@@ -167,21 +186,6 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="brand" className="text-sm font-medium text-gray-600">Brand</Label>
-              <Select value={formData.brand} onValueChange={(value) => handleInputChange("brand", value)}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select brand" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="premium">Premium Tarp</SelectItem>
-                  <SelectItem value="heavy-duty">Heavy Duty</SelectItem>
-                  <SelectItem value="waterproof">Waterproof Pro</SelectItem>
-                  <SelectItem value="industrial">Industrial Grade</SelectItem>
-                  <SelectItem value="custom">Custom Brand</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </div>
 
@@ -189,8 +193,8 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
         <div className="border rounded-lg p-6 bg-gray-50">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-700">Items</h3>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleAddItem}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm"
             >
@@ -198,7 +202,7 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
               Add Item
             </Button>
           </div>
-          
+
           {items.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               No items added yet. Click "Add Item" to get started.
@@ -252,37 +256,58 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
               <Checkbox
                 id="xFactory"
                 checked={formData.xFactory}
-                onCheckedChange={(checked) => handleInputChange("xFactory", checked)}
+                onCheckedChange={(checked) => handleDeliveryChange("xFactory", checked)}
               />
-              <Label htmlFor="xFactory" className="text-sm font-medium text-gray-600">Ex-Factory</Label>
+              <Label htmlFor="xFactory" className="text-sm font-medium text-gray-600">X-Factory</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="forDelivery"
                 checked={formData.forDelivery}
-                onCheckedChange={(checked) => handleInputChange("forDelivery", checked)}
+                onCheckedChange={(checked) => handleDeliveryChange("forDelivery", checked)}
               />
               <Label htmlFor="forDelivery" className="text-sm font-medium text-gray-600">FOR Delivery</Label>
             </div>
-            <div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="transport"
+                checked={formData.transport}
+                onCheckedChange={(checked) => handleDeliveryChange("transport", checked)}
+              />
               <Label htmlFor="transport" className="text-sm font-medium text-gray-600">Transport</Label>
-              <Select value={formData.transport} onValueChange={(value) => handleInputChange("transport", value)}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select transport" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="own">Own Transport</SelectItem>
-                  <SelectItem value="courier">Courier</SelectItem>
-                  <SelectItem value="freight">Freight</SelectItem>
-                  <SelectItem value="pickup">Customer Pickup</SelectItem>
-                </SelectContent>
-              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Transport Details */}
+        <div className="border rounded-lg p-6 bg-gray-50">
+          <h3 className="text-lg font-semibold mb-4 text-gray-700">Transport Details</h3>
+          <div className="flex justify-between gap-6">
+           <div className="w-1/2">
+              <Label htmlFor="transportName" className="text-sm font-medium text-gray-600">Transport Name</Label>
+              <Input
+                id="transportName"
+                value={formData.transportName}
+                onChange={(e) => handleInputChange("transportName", e.target.value)}
+                placeholder="Enter transport name"
+                className="mt-1"
+              />
+            </div>
+            <div className="w-1/2">
+              <Label htmlFor="transportContact" className="text-sm font-medium text-gray-600">Transport Contact Number</Label>
+              <Input
+                id="transportContact"
+                value={formData.transportContact}
+                onChange={(e) => handleInputChange("transportContact", e.target.value)}
+                placeholder="+91 9999999999"
+                className="mt-1"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Item Dialog */}
+      {/*Create Item Dialog */}
       <Dialog open={isItemDialogOpen} onOpenChange={setIsItemDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -290,7 +315,7 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
               {editingItemIndex !== null ? "Edit Item" : "Add Item"}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
             <div>
               <Label className="text-sm font-medium text-gray-600">Item Name</Label>
@@ -301,7 +326,7 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
                 className="mt-1"
               />
             </div>
-            
+
             <div>
               <Label className="text-sm font-medium text-gray-600">GSM</Label>
               <Input
@@ -416,14 +441,14 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
           </div>
 
           <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setIsItemDialogOpen(false)}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleItemSubmit}
               className="bg-blue-600 hover:bg-blue-700"
             >
@@ -438,7 +463,7 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
         <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button 
+        <Button
           onClick={handleSubmit}
           className="bg-blue-600 hover:bg-blue-700"
         >

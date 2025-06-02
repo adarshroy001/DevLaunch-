@@ -44,7 +44,6 @@ const LowStockAlertsPage = () => {
                       <p className="text-sm text-red-600">Current Stock: {item.stock}</p>
                       <p className="text-sm text-gray-500">Threshold: {item.threshold}</p>
                     </div>
-                    <Button variant="outline" size="sm">Reorder</Button>
                   </li>
                 ))}
               </ul>

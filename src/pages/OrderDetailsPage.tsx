@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -11,10 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/hooks/use-toast";
 import { orderBookMockOrders, ORDER_BOOK_STATUSES } from "@/data/orderBookMockData";
 import type { OrderBookEntry } from "@/types";
-import { ArrowLeft, Edit, Plus, Printer, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Printer, Save, Trash2, Share2 } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
@@ -29,15 +29,15 @@ const OrderDetailsPage = () => {
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [itemFormData, setItemFormData] = useState({
-    itemName: "",
+    ProductName: "",
     gsm: "",
     colourTop: "",
     colourBottom: "",
-    length: "",
     width: "",
     quantity: "",
-    unit: "",
-    pcsPerUnit: "",
+    weight: "",
+    pcsPerUnit: '',
+    length: "",
     remarks: ""
   });
   // Update items section starts here 
@@ -47,6 +47,7 @@ const OrderDetailsPage = () => {
     const foundOrder = orderBookMockOrders.find(o => o.id === orderId);
     if (foundOrder) {
       setOrder(foundOrder);
+
       setCurrentStatus(foundOrder.status);
       setCurrentItems(foundOrder.items);
     } else {
@@ -69,14 +70,6 @@ const OrderDetailsPage = () => {
     }
   };
 
-  const handleProductUpdate = () => {
-    if (order) {
-      // In a real app, this would be an API call
-      setOrder(prev => prev ? { ...prev, items: currentItems } : null);
-      toast({ title: "Product Updated", description: `Order ${order.id} product details updated.` });
-    }
-  };
-
   if (!order) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -90,7 +83,6 @@ const OrderDetailsPage = () => {
 
   // Update items section starts here 
 
-
   const handleItemInputChange = (field: string, value: string) => {
     setItemFormData(prev => ({
       ...prev,
@@ -100,15 +92,15 @@ const OrderDetailsPage = () => {
 
   const resetItemForm = () => {
     setItemFormData({
-      itemName: "",
+      ProductName: "",
       gsm: "",
       colourTop: "",
       colourBottom: "",
-      length: "",
       width: "",
       quantity: "",
-      unit: "",
-      pcsPerUnit: "",
+      weight: "",
+      pcsPerUnit: '',
+      length: "",
       remarks: ""
     });
   };
@@ -159,10 +151,16 @@ const OrderDetailsPage = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>Order ID: {order.id}</CardTitle>
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="mr-2 h-4 w-4" />
-                Print Order
-              </Button>
+              <div >
+                <Button className="mx-2" variant="outline" >
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share
+                </Button>
+                <Button className="mx-2" variant="outline" onClick={handlePrint}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print Order
+                </Button>
+              </div>
             </div>
             <CardDescription>Customer: {order.customer} | Date: {order.date}</CardDescription>
           </CardHeader>
@@ -173,9 +171,22 @@ const OrderDetailsPage = () => {
                 <OrderStatusBadge status={order.status} />
               </div>
             </div>
-            <div>
-              <Label>Product Details</Label>
-              <p>{order.items}</p>
+            <div className="flex justify-between">
+              <div>
+                <Label>Product Details</Label>
+                <p>{order.items}</p>
+              </div>
+              <div>
+                <td className="pr-8 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <Link to={``} className="text-blue-600 hover:text-blue-900">
+                    View
+                  </Link>
+                </td>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Label className="p-0 mt-1">Remark</Label>
+              <p className="p-0 m-0">''Note we have to add remark here''</p>
             </div>
           </CardContent>
         </Card>
@@ -205,7 +216,8 @@ const OrderDetailsPage = () => {
                 </CardFooter>
               </div>
             </CardContent>
-            <div className="pr-12 pl-8 pb-4">
+            {/* Update Items */}
+            <div className="pr-12 pl-6 pb-4">
               <div className="flex justify-between items-center mb-4 flex-wrap">
                 <h3 className="text-lg md:text-2xl font-semibold ">Update Items</h3>
                 <Button
@@ -228,13 +240,13 @@ const OrderDetailsPage = () => {
                     <div key={index} className="flex items-center justify-between p-4 bg-white border rounded-lg">
                       <div className="flex-1">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                          <div><span className="font-medium">Item:</span> {item.itemName}</div>
+                          <div><span className="font-medium">Item:</span> {item.ProductName}</div>
                           <div><span className="font-medium">GSM:</span> {item.gsm}</div>
-                          <div><span className="font-medium">Size:</span> {item.length}ft x {item.width}ft</div>
-                          <div><span className="font-medium">Qty:</span> {item.quantity} {item.unit}</div>
+                          <div><span className="font-medium">Width:</span> {item.width}in</div>
+                          <div><span className="font-medium">Qty:</span> {item.quantity}</div>
                           <div><span className="font-medium">Top Color:</span> {item.colourTop}</div>
                           <div><span className="font-medium">Bottom Color:</span> {item.colourBottom}</div>
-                          <div><span className="font-medium">Pcs/Unit:</span> {item.pcsPerUnit}</div>
+                          <div><span className="font-medium">Weight:</span> {item.weight}Kg</div>
                           {item.remarks && <div><span className="font-medium">Remarks:</span> {item.remarks}</div>}
                         </div>
                       </div>
@@ -262,137 +274,263 @@ const OrderDetailsPage = () => {
                 </div>
               )}
             </div>
-            {/* Item Dialog */}
+            {/*Add Item Dialog */}
             <Dialog open={isItemDialogOpen} onOpenChange={setIsItemDialogOpen}>
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
-                    {editingItemIndex !== null ? "Edit Item" : "Add Item"}
+                    {editingItemIndex !== null ? "Edit Finished Product" : "Add Finished Product"}
                   </DialogTitle>
                 </DialogHeader>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Item Name</Label>
-                    <Input
-                      value={itemFormData.itemName}
-                      onChange={(e) => handleItemInputChange("itemName", e.target.value)}
-                      placeholder="Enter item name"
-                      className="mt-1"
-                    />
-                  </div>
+                <div className="py-4">
+                  <Tabs defaultValue="rolls" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-4">
+                      <TabsTrigger value="rolls">Add Rolls</TabsTrigger>
+                      <TabsTrigger value="bundles">Add Bundles</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="rolls">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Add Rolls</CardTitle>
+                          <CardDescription>Enter details for the tarpaulin rolls.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <Label htmlFor="rollName">Product Name/Type</Label>
+                            <Input
+                              id="rollName"
+                              placeholder="e.g., Heavy Duty Tarpaulin Blue"
+                              value={itemFormData.ProductName}
+                              onChange={(e) => handleItemInputChange("ProductName", e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label>GSM</Label>
+                            <Input
+                              placeholder="e.g., 120, 150, 180"
+                              className="mt-1"
+                              value={itemFormData.gsm}
+                              onChange={(e) => handleItemInputChange("gsm", e.target.value)}
+                            />
+                          </div>
+                          {/* colours */}
+                          <div className="flex justify-between">
+                            <div className="w-2/5">
+                              <Label>Colour Top</Label>
+                              <Select value={itemFormData.colourTop} onValueChange={(value) => handleItemInputChange("colourTop", value)}>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Select top colour" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="blue">Blue</SelectItem>
+                                  <SelectItem value="green">Green</SelectItem>
+                                  <SelectItem value="red">Red</SelectItem>
+                                  <SelectItem value="white">White</SelectItem>
+                                  <SelectItem value="black">Black</SelectItem>
+                                  <SelectItem value="yellow">Yellow</SelectItem>
+                                  <SelectItem value="orange">Orange</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
 
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">GSM</Label>
-                    <Input
-                      value={itemFormData.gsm}
-                      onChange={(e) => handleItemInputChange("gsm", e.target.value)}
-                      placeholder="e.g., 120, 150, 180"
-                      className="mt-1"
-                    />
-                  </div>
+                            <div className="w-2/5">
+                              <Label>Colour Bottom</Label>
+                              <Select value={itemFormData.colourBottom} onValueChange={(value) => handleItemInputChange("colourBottom", value)}>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Select bottom colour" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="blue">Blue</SelectItem>
+                                  <SelectItem value="green">Green</SelectItem>
+                                  <SelectItem value="red">Red</SelectItem>
+                                  <SelectItem value="white">White</SelectItem>
+                                  <SelectItem value="black">Black</SelectItem>
+                                  <SelectItem value="yellow">Yellow</SelectItem>
+                                  <SelectItem value="orange">Orange</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          {/* Width and weight */}
+                          <div className="flex justify-between">
+                            <div className="w-2/5">
+                              <Label htmlFor="rollWidth">Width (In)</Label>
+                              <Input
+                                id="rollWidth"
+                                type="number"
+                                placeholder="e.g., 2"
+                                min={0}
+                                value={itemFormData.width}
+                                onChange={(e) => handleItemInputChange("width", e.target.value)}
+                              />
+                            </div>
+                            <div className="w-2/5">
+                              <Label htmlFor="rollWeight">Weight (Kg)</Label>
+                              <Input
+                                id="rollWeight"
+                                type="number"
+                                placeholder="e.g., 7"
+                                min={0}
+                                value={itemFormData.weight}
+                                onChange={(e) => handleItemInputChange("weight", e.target.value)}
+                              />
+                            </div>
+                          </div>
 
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Colour Top</Label>
-                    <Select value={itemFormData.colourTop} onValueChange={(value) => handleItemInputChange("colourTop", value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select top colour" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="blue">Blue</SelectItem>
-                        <SelectItem value="green">Green</SelectItem>
-                        <SelectItem value="red">Red</SelectItem>
-                        <SelectItem value="white">White</SelectItem>
-                        <SelectItem value="black">Black</SelectItem>
-                        <SelectItem value="yellow">Yellow</SelectItem>
-                        <SelectItem value="orange">Orange</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                          <div>
+                            <Label htmlFor="rollQuantity">Quantity of Rolls</Label>
+                            <Input
+                              id="rollQuantity"
+                              type="number"
+                              placeholder="e.g., 10"
+                              min={0}
+                              value={itemFormData.quantity}
+                              onChange={(e) => handleItemInputChange("quantity", e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="rollRemarks">Remarks (Optional)</Label>
+                            <Textarea
+                              id="rollRemarks"
+                              placeholder="Enter any additional notes for rolls"
+                              value={itemFormData.remarks}
+                              onChange={(e) => handleItemInputChange("remarks", e.target.value)}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="bundles">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Add Bundles</CardTitle>
+                          <CardDescription>Enter details for the tarpaulin bundles.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <Label htmlFor="bundleName">Product Name/Type</Label>
+                            <Input
+                              id="bundleName"
+                              placeholder="e.g., Standard Tarpaulin Pack"
+                              value={itemFormData.ProductName}
+                              onChange={(e) => handleItemInputChange("ProductName", e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label>GSM</Label>
+                            <Input
+                              placeholder="e.g., 120, 150, 180"
+                              className="mt-1"
+                              value={itemFormData.gsm}
+                              onChange={(e) => handleItemInputChange("gsm", e.target.value)}
+                            />
+                          </div>
+                          {/* colour */}
+                          <div className="flex justify-between">
+                            <div className="w-2/5">
+                              <Label>Colour Top</Label>
+                              <Select value={itemFormData.colourTop} onValueChange={(value) => handleItemInputChange("colourTop", value)}>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Select top colour" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="blue">Blue</SelectItem>
+                                  <SelectItem value="green">Green</SelectItem>
+                                  <SelectItem value="red">Red</SelectItem>
+                                  <SelectItem value="white">White</SelectItem>
+                                  <SelectItem value="black">Black</SelectItem>
+                                  <SelectItem value="yellow">Yellow</SelectItem>
+                                  <SelectItem value="orange">Orange</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
 
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Colour Bottom</Label>
-                    <Select value={itemFormData.colourBottom} onValueChange={(value) => handleItemInputChange("colourBottom", value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select bottom colour" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="blue">Blue</SelectItem>
-                        <SelectItem value="green">Green</SelectItem>
-                        <SelectItem value="red">Red</SelectItem>
-                        <SelectItem value="white">White</SelectItem>
-                        <SelectItem value="black">Black</SelectItem>
-                        <SelectItem value="yellow">Yellow</SelectItem>
-                        <SelectItem value="orange">Orange</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                            <div className="w-2/5">
+                              <Label>Colour Bottom</Label>
+                              <Select value={itemFormData.colourBottom} onValueChange={(value) => handleItemInputChange("colourBottom", value)}>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Select bottom colour" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="blue">Blue</SelectItem>
+                                  <SelectItem value="green">Green</SelectItem>
+                                  <SelectItem value="red">Red</SelectItem>
+                                  <SelectItem value="white">White</SelectItem>
+                                  <SelectItem value="black">Black</SelectItem>
+                                  <SelectItem value="yellow">Yellow</SelectItem>
+                                  <SelectItem value="orange">Orange</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
 
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Length (ft)</Label>
-                    <Input
-                      value={itemFormData.length}
-                      onChange={(e) => handleItemInputChange("length", e.target.value)}
-                      placeholder="e.g., 20"
-                      className="mt-1"
-                    />
-                  </div>
+                          {/* dimensions of bundle */}
+                          <div className="flex justify-between">
+                            <div>
+                              <Label htmlFor="length">Length (ft)</Label>
+                              <Input
+                                id="length"
+                                placeholder="e.g., 10 ft"
+                                value={itemFormData.length}
+                                onChange={(e) => handleItemInputChange("length", e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="width">Width (ft)</Label>
+                              <Input
+                                id="bundleSize"
+                                placeholder="e.g., 10x12 ft"
+                                value={itemFormData.width}
+                                onChange={(e) => handleItemInputChange("width", e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="weight">Weight (Kg)</Label>
+                              <Input
+                                id="weight"
+                                placeholder="e.g., 10 Kg"
+                                value={itemFormData.weight}
+                                onChange={(e) => handleItemInputChange("weight", e.target.value)}
+                              />
+                            </div>
+                          </div>
 
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Width (ft)</Label>
-                    <Input
-                      value={itemFormData.width}
-                      onChange={(e) => handleItemInputChange("width", e.target.value)}
-                      placeholder="e.g., 30"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Quantity</Label>
-                    <Input
-                      value={itemFormData.quantity}
-                      onChange={(e) => handleItemInputChange("quantity", e.target.value)}
-                      placeholder="e.g., 10"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Unit</Label>
-                    <Select value={itemFormData.unit} onValueChange={(value) => handleItemInputChange("unit", value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pieces">Pieces</SelectItem>
-                        <SelectItem value="meters">Meters</SelectItem>
-                        <SelectItem value="yards">Yards</SelectItem>
-                        <SelectItem value="rolls">Rolls</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-gray-600">Pcs/Unit</Label>
-                    <Input
-                      value={itemFormData.pcsPerUnit}
-                      onChange={(e) => handleItemInputChange("pcsPerUnit", e.target.value)}
-                      placeholder="e.g., 5"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <Label className="text-sm font-medium text-gray-600">Remarks</Label>
-                    <Textarea
-                      value={itemFormData.remarks}
-                      onChange={(e) => handleItemInputChange("remarks", e.target.value)}
-                      placeholder="Enter any remarks or special instructions"
-                      rows={3}
-                      className="mt-1"
-                    />
-                  </div>
+                          <div>
+                            <Label htmlFor="bundleQuantity">Quantity of Bundles</Label>
+                            <Input
+                              id="bundleQuantity"
+                              type="number"
+                              placeholder="e.g., 50"
+                              min={0}
+                              value={itemFormData.quantity}
+                              onChange={(e) => handleItemInputChange("quantity", e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="itemsPerBundle">Pieces per Bundle</Label>
+                            <Input
+                              id="itemsPerBundle"
+                              type="number"
+                              placeholder="e.g., 5"
+                              min={0}
+                              value={itemFormData.pcsPerUnit}
+                              onChange={(e) => handleItemInputChange("pcsPerUnit", e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="bundleRemarks">Remarks (Optional)</Label>
+                            <Textarea
+                              id="bundleRemarks"
+                              placeholder="Enter any additional notes for bundles"
+                              value={itemFormData.remarks}
+                              onChange={(e) => handleItemInputChange("remarks", e.target.value)}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </Tabs>
                 </div>
 
                 <DialogFooter>
@@ -412,7 +550,14 @@ const OrderDetailsPage = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-
+            <div className="flex gap-2 justify-center mb-6 mt-2">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Discard Changes
+              </Button>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Update Changes
+              </Button>
+            </div>
           </Card>
         </div>
       </div>

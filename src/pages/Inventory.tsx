@@ -169,7 +169,7 @@ const Inventory = () => {
                       <StockStatusBadge status={item.status} />
                     </td>
                     <td className="px-10 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">Edit</button>
+                      <button className="text-blue-600 hover:text-blue-900">View</button>
                     </td>
                   </tr>
                 ))}

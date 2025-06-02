@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Assuming Select is available
-import { ArrowLeft, Printer, Filter } from "lucide-react";
+import { ArrowLeft, Printer, Filter, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const InventoryReportPage = () => {
@@ -34,10 +34,17 @@ const InventoryReportPage = () => {
                   Filter and view inventory reports.
                 </CardDescription>
               </div>
-              <Button onClick={handlePrint} variant="outline">
-                <Printer className="mr-2 h-4 w-4" />
-                Print Report
-              </Button>
+
+              <div >
+                <Button className="mx-2" variant="outline" >
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share
+                </Button>
+                <Button onClick={handlePrint} variant="outline">
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print Report
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -63,7 +70,7 @@ const InventoryReportPage = () => {
                 </div>
                 <div>
                   <Label htmlFor="status">Stock Status</Label>
-                   <Select>
+                  <Select>
                     <SelectTrigger id="status">
                       <SelectValue placeholder="All Statuses" />
                     </SelectTrigger>
@@ -77,12 +84,12 @@ const InventoryReportPage = () => {
                 </div>
                 <div>
                   <Label htmlFor="dateRange">Date Range</Label>
-                  <Input id="dateRange" type="date" /> 
+                  <Input id="dateRange" type="date" />
                   {/* Consider using shadcn Calendar for date range picker if needed */}
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="mt-6">
               <h3 className="text-lg font-medium mb-2">Report Preview</h3>
               <div className="border rounded-md p-4 min-h-[200px] bg-gray-50">
