@@ -2,11 +2,10 @@ import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import AddOrderForm from "@/components/forms/AddOrderForm";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, X } from "lucide-react";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
 import { Link } from "react-router-dom";
 
@@ -20,12 +19,15 @@ const MOCK_ORDERS = [
 ];
 
 const Orders = () => {
-  const [activeTab, setActiveTab] = useState("all");
-  const [dateRange, setDateRange] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [productFilter, setProductFilter] = useState("");
-  const [customerFilter, setCustomerFilter] = useState("");
+  const [filter, setFilter] = useState("all");
   const [isAddOrderOpen, setIsAddOrderOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    status: "All Status",
+    products: [],
+    startDate: "",
+    endDate: ""
+  });
 
   const tabs = [
     { id: "all", label: "All Orders" },
@@ -33,6 +35,29 @@ const Orders = () => {
     { id: "dispatched", label: "Dispatched" },
     { id: "cancelled", label: "Cancelled" }
   ];
+
+  const handleProductChange = (product, checked) => {
+    setFilters(prev => ({
+      ...prev,
+      products: checked
+        ? [...prev.products, product]
+        : prev.products.filter(p => p !== product)
+    }));
+  };
+
+  const handleApplyFilters = () => {
+    // Apply filter logic here
+    setIsFilterModalOpen(false);
+  };
+
+  const handleClearAll = () => {
+    setFilters({
+      status: "All Status",
+      products: [],
+      startDate: "",
+      endDate: ""
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,82 +80,32 @@ const Orders = () => {
         <div className="bg-white rounded-lg shadow-sm">
           {/* Tabs */}
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`}
+            <nav className="flex py-0 px-6">
+              <button 
+                  className={`px-3 my-2 text-sm rounded-md ${filter === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  onClick={() => setFilter('all')}
                 >
-                  {tab.label}
+                  All Orders
                 </button>
-              ))}
+              {/* Filter Section - Updated */}
+              <div className="my-2">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+                  <div className="flex space-x-4">
+                    <button
+                      className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
+                      onClick={() => setIsFilterModalOpen(true)}
+                    >
+                      <Filter className="w-4 h-4" />
+                      Filter
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </nav>
           </div>
 
-          {/* Filters */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center space-x-2 mb-4">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filters</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                <Select value={dateRange} onValueChange={setDateRange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select date range" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="today">Today</SelectItem>
-                    <SelectItem value="week">This Week</SelectItem>
-                    <SelectItem value="month">This Month</SelectItem>
-                    <SelectItem value="quarter">This Quarter</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="dispatched">Dispatched</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
-                <Select value={productFilter} onValueChange={setProductFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select product type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="heavy-duty">Heavy Duty Tarpaulin</SelectItem>
-                    <SelectItem value="waterproof">Waterproof Canvas</SelectItem>
-                    <SelectItem value="vinyl">Industrial Vinyl Tarp</SelectItem>
-                    <SelectItem value="custom">Custom Print Tarpaulin</SelectItem>
-                    <SelectItem value="fire-retardant">Fire Retardant Tarp</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
-                <Input
-                  placeholder="Enter customer name"
-                  value={customerFilter}
-                  onChange={(e) => setCustomerFilter(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
+
 
           {/* Orders Table */}
           <div className="overflow-x-auto">
@@ -180,6 +155,108 @@ const Orders = () => {
           </div>
         </div>
       </div>
+
+      {/* Filter Modal */}
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold">Filter Orders</h2>
+              <button
+                onClick={() => setIsFilterModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Status Section */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option>All Status</option>
+                <option>Pending</option>
+                <option>Dispatched</option>
+                <option>Completed</option>
+                <option>Cancelled</option>
+              </select>
+            </div>
+
+            {/* Products Section */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Products</label>
+              <div className="space-y-2">
+                {['Heavy Duty Tarpaulin', 'Waterproof Canvas', 'Industrial Vinyl Tarp', 'Custom Print Tarpaulin', 'Fire Retardant Tarp'].map((product) => (
+                  <label key={product} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={filters.products.includes(product)}
+                      onChange={(e) => handleProductChange(product, e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{product}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Date Range Section */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                  <input
+                    type="date"
+                    value={filters.endDate}
+                    onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Clear All Option */}
+            <div className="mb-6">
+              <button
+                onClick={handleClearAll}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                Clear All
+              </button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setIsFilterModalOpen(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApplyFilters}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
