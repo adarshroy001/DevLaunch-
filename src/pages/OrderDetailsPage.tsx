@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AddRemark from "@/components/remark/remark";
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
@@ -37,6 +36,8 @@ const OrderDetailsPage = () => {
     width: "",
     quantity: "",
     weight: "",
+    pcsPerUnit: '',
+    length: "",
     remarks: ""
   });
   // Update items section starts here 
@@ -46,9 +47,7 @@ const OrderDetailsPage = () => {
     const foundOrder = orderBookMockOrders.find(o => o.id === orderId);
     if (foundOrder) {
       setOrder(foundOrder);
-      //
-      setItems([foundOrder])
-      //
+
       setCurrentStatus(foundOrder.status);
       setCurrentItems(foundOrder.items);
     } else {
@@ -100,6 +99,8 @@ const OrderDetailsPage = () => {
       width: "",
       quantity: "",
       weight: "",
+      pcsPerUnit: '',
+      length: "",
       remarks: ""
     });
   };
@@ -170,9 +171,22 @@ const OrderDetailsPage = () => {
                 <OrderStatusBadge status={order.status} />
               </div>
             </div>
-            <div>
-              <Label>Product Details</Label>
-              <p>{order.items}</p>
+            <div className="flex justify-between">
+              <div>
+                <Label>Product Details</Label>
+                <p>{order.items}</p>
+              </div>
+              <div>
+                <td className="pr-8 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <Link to={``} className="text-blue-600 hover:text-blue-900">
+                    View
+                  </Link>
+                </td>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Label className="p-0 mt-1">Remark</Label>
+              <p className="p-0 m-0">''Note we have to add remark here''</p>
             </div>
           </CardContent>
         </Card>
@@ -284,8 +298,8 @@ const OrderDetailsPage = () => {
                         <CardContent className="space-y-4">
                           <div>
                             <Label htmlFor="rollName">Product Name/Type</Label>
-                            <Input 
-                              id="rollName" 
+                            <Input
+                              id="rollName"
                               placeholder="e.g., Heavy Duty Tarpaulin Blue"
                               value={itemFormData.ProductName}
                               onChange={(e) => handleItemInputChange("ProductName", e.target.value)}
@@ -293,8 +307,8 @@ const OrderDetailsPage = () => {
                           </div>
                           <div>
                             <Label>GSM</Label>
-                            <Input 
-                              placeholder="e.g., 120, 150, 180" 
+                            <Input
+                              placeholder="e.g., 120, 150, 180"
                               className="mt-1"
                               value={itemFormData.gsm}
                               onChange={(e) => handleItemInputChange("gsm", e.target.value)}
@@ -342,10 +356,10 @@ const OrderDetailsPage = () => {
                           <div className="flex justify-between">
                             <div className="w-2/5">
                               <Label htmlFor="rollWidth">Width (In)</Label>
-                              <Input 
-                                id="rollWidth" 
-                                type="number" 
-                                placeholder="e.g., 2" 
+                              <Input
+                                id="rollWidth"
+                                type="number"
+                                placeholder="e.g., 2"
                                 min={0}
                                 value={itemFormData.width}
                                 onChange={(e) => handleItemInputChange("width", e.target.value)}
@@ -353,10 +367,10 @@ const OrderDetailsPage = () => {
                             </div>
                             <div className="w-2/5">
                               <Label htmlFor="rollWeight">Weight (Kg)</Label>
-                              <Input 
-                                id="rollWeight" 
-                                type="number" 
-                                placeholder="e.g., 7" 
+                              <Input
+                                id="rollWeight"
+                                type="number"
+                                placeholder="e.g., 7"
                                 min={0}
                                 value={itemFormData.weight}
                                 onChange={(e) => handleItemInputChange("weight", e.target.value)}
@@ -366,10 +380,10 @@ const OrderDetailsPage = () => {
 
                           <div>
                             <Label htmlFor="rollQuantity">Quantity of Rolls</Label>
-                            <Input 
-                              id="rollQuantity" 
-                              type="number" 
-                              placeholder="e.g., 10" 
+                            <Input
+                              id="rollQuantity"
+                              type="number"
+                              placeholder="e.g., 10"
                               min={0}
                               value={itemFormData.quantity}
                               onChange={(e) => handleItemInputChange("quantity", e.target.value)}
@@ -377,8 +391,8 @@ const OrderDetailsPage = () => {
                           </div>
                           <div>
                             <Label htmlFor="rollRemarks">Remarks (Optional)</Label>
-                            <Textarea 
-                              id="rollRemarks" 
+                            <Textarea
+                              id="rollRemarks"
                               placeholder="Enter any additional notes for rolls"
                               value={itemFormData.remarks}
                               onChange={(e) => handleItemInputChange("remarks", e.target.value)}
@@ -396,8 +410,8 @@ const OrderDetailsPage = () => {
                         <CardContent className="space-y-4">
                           <div>
                             <Label htmlFor="bundleName">Product Name/Type</Label>
-                            <Input 
-                              id="bundleName" 
+                            <Input
+                              id="bundleName"
                               placeholder="e.g., Standard Tarpaulin Pack"
                               value={itemFormData.ProductName}
                               onChange={(e) => handleItemInputChange("ProductName", e.target.value)}
@@ -405,8 +419,8 @@ const OrderDetailsPage = () => {
                           </div>
                           <div>
                             <Label>GSM</Label>
-                            <Input 
-                              placeholder="e.g., 120, 150, 180" 
+                            <Input
+                              placeholder="e.g., 120, 150, 180"
                               className="mt-1"
                               value={itemFormData.gsm}
                               onChange={(e) => handleItemInputChange("gsm", e.target.value)}
@@ -455,8 +469,8 @@ const OrderDetailsPage = () => {
                           <div className="flex justify-between">
                             <div>
                               <Label htmlFor="length">Length (ft)</Label>
-                              <Input 
-                                id="length" 
+                              <Input
+                                id="length"
                                 placeholder="e.g., 10 ft"
                                 value={itemFormData.length}
                                 onChange={(e) => handleItemInputChange("length", e.target.value)}
@@ -464,8 +478,8 @@ const OrderDetailsPage = () => {
                             </div>
                             <div>
                               <Label htmlFor="width">Width (ft)</Label>
-                              <Input 
-                                id="bundleSize" 
+                              <Input
+                                id="bundleSize"
                                 placeholder="e.g., 10x12 ft"
                                 value={itemFormData.width}
                                 onChange={(e) => handleItemInputChange("width", e.target.value)}
@@ -473,8 +487,8 @@ const OrderDetailsPage = () => {
                             </div>
                             <div>
                               <Label htmlFor="weight">Weight (Kg)</Label>
-                              <Input 
-                                id="weight" 
+                              <Input
+                                id="weight"
                                 placeholder="e.g., 10 Kg"
                                 value={itemFormData.weight}
                                 onChange={(e) => handleItemInputChange("weight", e.target.value)}
@@ -484,10 +498,10 @@ const OrderDetailsPage = () => {
 
                           <div>
                             <Label htmlFor="bundleQuantity">Quantity of Bundles</Label>
-                            <Input 
-                              id="bundleQuantity" 
-                              type="number" 
-                              placeholder="e.g., 50" 
+                            <Input
+                              id="bundleQuantity"
+                              type="number"
+                              placeholder="e.g., 50"
                               min={0}
                               value={itemFormData.quantity}
                               onChange={(e) => handleItemInputChange("quantity", e.target.value)}
@@ -495,10 +509,10 @@ const OrderDetailsPage = () => {
                           </div>
                           <div>
                             <Label htmlFor="itemsPerBundle">Pieces per Bundle</Label>
-                            <Input 
-                              id="itemsPerBundle" 
-                              type="number" 
-                              placeholder="e.g., 5" 
+                            <Input
+                              id="itemsPerBundle"
+                              type="number"
+                              placeholder="e.g., 5"
                               min={0}
                               value={itemFormData.pcsPerUnit}
                               onChange={(e) => handleItemInputChange("pcsPerUnit", e.target.value)}
@@ -506,8 +520,8 @@ const OrderDetailsPage = () => {
                           </div>
                           <div>
                             <Label htmlFor="bundleRemarks">Remarks (Optional)</Label>
-                            <Textarea 
-                              id="bundleRemarks" 
+                            <Textarea
+                              id="bundleRemarks"
                               placeholder="Enter any additional notes for bundles"
                               value={itemFormData.remarks}
                               onChange={(e) => handleItemInputChange("remarks", e.target.value)}
