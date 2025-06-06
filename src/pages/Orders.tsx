@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import AddOrderForm from "@/components/forms/AddOrderForm";
 import { Button } from "@/components/ui/button";
@@ -8,15 +8,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Filter, X } from "lucide-react";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
 import { Link } from "react-router-dom";
-
-// Mock data for tarpaulin orders
-const MOCK_ORDERS = [
-  { id: "ORD123", customer: "John Doe", product: "Heavy Duty Tarpaulin 20x30", quantity: 5, date: "2025-05-20", status: "Pending" },
-  { id: "ORD124", customer: "Sarah Smith", product: "Waterproof Canvas 15x25", quantity: 2, date: "2025-05-20", status: "Dispatched" },
-  { id: "ORD125", customer: "Michael Johnson", product: "Industrial Vinyl Tarp 10x15", quantity: 7, date: "2025-05-20", status: "Completed" },
-  { id: "ORD126", customer: "Emma Wilson", product: "Custom Print Tarpaulin 12x18", quantity: 1, date: "2025-05-19", status: "Pending" },
-  { id: "ORD127", customer: "Robert Brown", product: "Fire Retardant Tarp 25x40", quantity: 4, date: "2025-05-19", status: "Cancelled" }
-];
+import { createOrder, getOrders, searchOrders, filterOrders } from "@/api/order";
 
 const Orders = () => {
   const [filter, setFilter] = useState("all");
@@ -29,12 +21,49 @@ const Orders = () => {
     endDate: ""
   });
 
-  const tabs = [
-    { id: "all", label: "All Orders" },
-    { id: "pending", label: "Pending Orders" },
-    { id: "dispatched", label: "Dispatched" },
-    { id: "cancelled", label: "Cancelled" }
-  ];
+  // API state management
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 0,
+  });
+
+  // Fetch orders on component mount
+  useEffect(() => {
+    fetchOrders();
+  }, [pagination.page]);
+
+  const fetchOrders = async (filterParams = {}) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const params = {
+        page: pagination.page,
+        limit: pagination.limit,
+        ...filterParams,
+      };
+
+      const response = await getOrders(params);
+      
+      if (response.success) {
+        setOrders(response.data.orders);
+        setPagination(response.data.pagination);
+      } else {
+        throw new Error(response.message || 'Failed to fetch orders');
+      }
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+      setError(err.message || 'Failed to fetch orders');
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleProductChange = (product, checked) => {
     setFilters(prev => ({
@@ -45,9 +74,64 @@ const Orders = () => {
     }));
   };
 
-  const handleApplyFilters = () => {
-    // Apply filter logic here
-    setIsFilterModalOpen(false);
+  const handleApplyFilters = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const filterParams: any = {};
+      
+      // Map UI filters to API parameters
+      if (filters.status !== "All Status") {
+        filterParams.status = filters.status.toLowerCase();
+      }
+      
+      if (filters.products.length > 0) {
+        // Use the first product as productType (API expects single product filter)
+        filterParams.productType = filters.products[0];
+      }
+      
+      if (filters.startDate) {
+        filterParams.startDate = filters.startDate;
+      }
+      
+      if (filters.endDate) {
+        filterParams.endDate = filters.endDate;
+      }
+
+      const params = {
+        page: 1, // Reset to first page when filtering
+        limit: pagination.limit,
+        ...filterParams,
+      };
+
+      // Try filterOrders first, fallback to getOrders if filter endpoint doesn't exist
+      let response;
+      try {
+        response = await filterOrders(params);
+      } catch (filterError: any) {
+        if (filterError.response?.status === 404) {
+          console.log("Filter endpoint not found, using getOrders with params");
+          response = await getOrders(params);
+        } else {
+          throw filterError;
+        }
+      }
+      
+      if (response.success) {
+        setOrders(response.data.orders);
+        setPagination(response.data.pagination);
+      } else {
+        throw new Error(response.message || 'Failed to filter orders');
+      }
+      
+      setIsFilterModalOpen(false);
+    } catch (err: any) {
+      console.error("Error filtering orders:", err);
+      setError(err.response?.data?.message || err.message || 'Failed to filter orders');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClearAll = () => {
@@ -57,6 +141,24 @@ const Orders = () => {
       startDate: "",
       endDate: ""
     });
+    // Fetch all orders without filters
+    fetchOrders();
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+  };
+
+  const handlePreviousPage = () => {
+    if (pagination.page > 1) {
+      handlePageChange(pagination.page - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (pagination.page < pagination.totalPages) {
+      handlePageChange(pagination.page + 1);
+    }
   };
 
   return (
@@ -105,7 +207,12 @@ const Orders = () => {
             </nav>
           </div>
 
-
+          {/* Error Message */}
+          {error && (
+            <div className="px-6 py-4 bg-red-50 border-l-4 border-red-400">
+              <p className="text-red-700">{error}</p>
+            </div>
+          )}
 
           {/* Orders Table */}
           <div className="overflow-x-auto">
@@ -122,23 +229,37 @@ const Orders = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {MOCK_ORDERS.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium text-blue-600">{order.id}</TableCell>
-                    <TableCell>{order.customer}</TableCell>
-                    <TableCell>{order.product}</TableCell>
-                    <TableCell className="pl-10">{order.quantity}</TableCell>
-                    <TableCell className="text-gray-500">{order.date}</TableCell>
-                    <TableCell>
-                      <OrderStatusBadge status={order.status} />
-                    </TableCell>
-                    <TableCell>
-                      <Link to={`/orderbook/${order.id}`} className="text-blue-600 hover:text-blue-900 text-center px-4">
-                        View
-                      </Link>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8">
+                      Loading orders...
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : orders.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                      No orders found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  orders.map((order) => (
+                    <TableRow key={order.orderId}>
+                      <TableCell className="font-medium text-blue-600">{order.orderId}</TableCell>
+                      <TableCell>{order.customerName}</TableCell>
+                      <TableCell>{order.product}</TableCell>
+                      <TableCell className="pl-10">{order.quantity}</TableCell>
+                      <TableCell className="text-gray-500">{order.date}</TableCell>
+                      <TableCell>
+                        <OrderStatusBadge status={order.status} />
+                      </TableCell>
+                      <TableCell>
+                        <Link to={`/orderbook/${order.orderId}`} className="text-blue-600 hover:text-blue-900 text-center px-4">
+                          View
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
@@ -146,10 +267,26 @@ const Orders = () => {
           {/* Pagination */}
           <div className="px-6 py-4 border-t border-gray-200">
             <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-700">Showing 5 of 124 orders</p>
+              <p className="text-sm text-gray-700">
+                Showing {orders.length} of {pagination.total} orders
+              </p>
               <div className="flex space-x-2">
-                <Button variant="outline" size="sm">Previous</Button>
-                <Button variant="outline" size="sm">Next</Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handlePreviousPage}
+                  disabled={pagination.page <= 1 || loading}
+                >
+                  Previous
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={pagination.page >= pagination.totalPages || loading}
+                >
+                  Next
+                </Button>
               </div>
             </div>
           </div>
@@ -250,8 +387,9 @@ const Orders = () => {
               <button
                 onClick={handleApplyFilters}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                disabled={loading}
               >
-                Apply Filters
+                {loading ? 'Applying...' : 'Apply Filters'}
               </button>
             </div>
           </div>
