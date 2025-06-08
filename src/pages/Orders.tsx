@@ -3,22 +3,37 @@ import Navbar from "@/components/layout/Navbar";
 import AddOrderForm from "@/components/forms/AddOrderForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Filter, X } from "lucide-react";
+import { Plus, Filter, X, Search } from "lucide-react";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
 import { Link } from "react-router-dom";
-import { createOrder, getOrders, searchOrders, filterOrders } from "@/api/order";
+import {
+  createOrder,
+  getOrders,
+  searchOrders,
+  filterOrders,
+} from "@/api/order";
 
 const Orders = () => {
   const [filter, setFilter] = useState("all");
   const [isAddOrderOpen, setIsAddOrderOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
   const [filters, setFilters] = useState({
     status: "All Status",
     products: [],
     startDate: "",
-    endDate: ""
+    endDate: "",
   });
 
   // API state management
@@ -32,16 +47,20 @@ const Orders = () => {
     totalPages: 0,
   });
 
-  // Fetch orders on component mount
+  // Fetch orders on component mount and when page changes
   useEffect(() => {
-    fetchOrders();
+    if (searchQuery) {
+      handleSearch();
+    } else {
+      fetchOrders();
+    }
   }, [pagination.page]);
 
   const fetchOrders = async (filterParams = {}) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = {
         page: pagination.page,
         limit: pagination.limit,
@@ -49,28 +68,74 @@ const Orders = () => {
       };
 
       const response = await getOrders(params);
-      
+
       if (response.success) {
         setOrders(response.data.orders);
         setPagination(response.data.pagination);
       } else {
-        throw new Error(response.message || 'Failed to fetch orders');
+        throw new Error(response.message || "Failed to fetch orders");
       }
     } catch (err) {
       console.error("Error fetching orders:", err);
-      setError(err.message || 'Failed to fetch orders');
+      setError(err.message || "Failed to fetch orders");
       setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Search functionality
+  const handleSearch = async () => {
+    // Reset to first page when searching
+    const searchParams = {
+      query: searchQuery.trim(),
+      page: 1,
+      limit: pagination.limit,
+      // Include any additional filters from UI
+      status: filters.status,
+    };
+
+    try {
+      setIsSearching(true);
+      setError(null);
+
+      // If search query is empty, fetch all orders with current filters
+      if (!searchParams.query) {
+        await fetchOrders(searchParams);
+        return;
+      }
+
+      const response = await searchOrders(searchParams);
+
+      if (response.success) {
+        setOrders(response.data.orders);
+        setPagination(response.data.pagination);
+      } else {
+        throw new Error(response.message || "Search failed");
+      }
+    } catch (err) {
+      console.error("Error searching orders:", err);
+      setError(err.message || "Search failed");
+      setOrders([]);
+      setPagination((prev) => ({ ...prev, total: 0, totalPages: 0 }));
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Handle pressing Enter key in search input
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const handleProductChange = (product, checked) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       products: checked
         ? [...prev.products, product]
-        : prev.products.filter(p => p !== product)
+        : prev.products.filter((p) => p !== product),
     }));
   };
 
@@ -78,57 +143,55 @@ const Orders = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const filterParams: any = {};
-      
-      // Map UI filters to API parameters
+
       if (filters.status !== "All Status") {
         filterParams.status = filters.status.toLowerCase();
       }
-      
+
       if (filters.products.length > 0) {
-        // Use the first product as productType (API expects single product filter)
         filterParams.productType = filters.products[0];
       }
-      
+
       if (filters.startDate) {
         filterParams.startDate = filters.startDate;
       }
-      
+
       if (filters.endDate) {
         filterParams.endDate = filters.endDate;
       }
 
       const params = {
-        page: 1, // Reset to first page when filtering
+        page: 1,
         limit: pagination.limit,
         ...filterParams,
       };
 
-      // Try filterOrders first, fallback to getOrders if filter endpoint doesn't exist
       let response;
       try {
         response = await filterOrders(params);
       } catch (filterError: any) {
         if (filterError.response?.status === 404) {
-          console.log("Filter endpoint not found, using getOrders with params");
           response = await getOrders(params);
         } else {
           throw filterError;
         }
       }
-      
+
       if (response.success) {
         setOrders(response.data.orders);
         setPagination(response.data.pagination);
       } else {
-        throw new Error(response.message || 'Failed to filter orders');
+        throw new Error(response.message || "Failed to filter orders");
       }
-      
+
       setIsFilterModalOpen(false);
     } catch (err: any) {
       console.error("Error filtering orders:", err);
-      setError(err.response?.data?.message || err.message || 'Failed to filter orders');
+      setError(
+        err.response?.data?.message || err.message || "Failed to filter orders"
+      );
     } finally {
       setLoading(false);
     }
@@ -139,14 +202,14 @@ const Orders = () => {
       status: "All Status",
       products: [],
       startDate: "",
-      endDate: ""
+      endDate: "",
     });
-    // Fetch all orders without filters
+    setSearchQuery("");
     fetchOrders();
   };
 
   const handlePageChange = (newPage) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
   const handlePreviousPage = () => {
@@ -180,31 +243,43 @@ const Orders = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm">
-          {/* Tabs */}
-          <div className="border-b border-gray-200">
-            <nav className="flex py-0 px-6">
-              <button 
-                  className={`px-3 my-2 text-sm rounded-md ${filter === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                  onClick={() => setFilter('all')}
-                >
-                  All Orders
-                </button>
-              {/* Filter Section - Updated */}
-              <div className="my-2">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                  <div className="flex space-x-4">
-                    <button
-                      className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
-                      onClick={() => setIsFilterModalOpen(true)}
-                    >
-                      <Filter className="w-4 h-4" />
-                      Filter
-                    </button>
-                  </div>
-                </div>
+          {/* Search and Filter Section */}
+          <div className="border-b border-gray-200 p-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Search Input */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search orders by ID, customer, or product..."
+                  className="pl-10 pr-4 py-2"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      fetchOrders();
+                    }}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
 
-            </nav>
+              {/* Filter Button */}
+              <Button
+                variant="outline"
+                onClick={() => setIsFilterModalOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                Filter
+              </Button>
+            </div>
           </div>
 
           {/* Error Message */}
@@ -229,31 +304,43 @@ const Orders = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
+                {loading || isSearching ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8">
-                      Loading orders...
+                      {isSearching ? "Searching..." : "Loading orders..."}
                     </TableCell>
                   </TableRow>
                 ) : orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      No orders found
+                    <TableCell
+                      colSpan={7}
+                      className="text-center py-8 text-gray-500"
+                    >
+                      {searchQuery
+                        ? "No matching orders found"
+                        : "No orders found"}
                     </TableCell>
                   </TableRow>
                 ) : (
                   orders.map((order) => (
                     <TableRow key={order.orderId}>
-                      <TableCell className="font-medium text-blue-600">{order.orderId}</TableCell>
+                      <TableCell className="font-medium text-blue-600">
+                        {order.orderId}
+                      </TableCell>
                       <TableCell>{order.customerName}</TableCell>
                       <TableCell>{order.product}</TableCell>
                       <TableCell className="pl-10">{order.quantity}</TableCell>
-                      <TableCell className="text-gray-500">{order.date}</TableCell>
+                      <TableCell className="text-gray-500">
+                        {order.date}
+                      </TableCell>
                       <TableCell>
                         <OrderStatusBadge status={order.status} />
                       </TableCell>
                       <TableCell>
-                        <Link to={`/orderbook/${order.orderId}`} className="text-blue-600 hover:text-blue-900 text-center px-4">
+                        <Link
+                          to={`/orderbook/${order.orderId}`}
+                          className="text-blue-600 hover:text-blue-900 text-center px-4"
+                        >
                           View
                         </Link>
                       </TableCell>
@@ -271,19 +358,23 @@ const Orders = () => {
                 Showing {orders.length} of {pagination.total} orders
               </p>
               <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={handlePreviousPage}
-                  disabled={pagination.page <= 1 || loading}
+                  disabled={pagination.page <= 1 || loading || isSearching}
                 >
                   Previous
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={handleNextPage}
-                  disabled={pagination.page >= pagination.totalPages || loading}
+                  disabled={
+                    pagination.page >= pagination.totalPages ||
+                    loading ||
+                    isSearching
+                  }
                 >
                   Next
                 </Button>
@@ -309,10 +400,14 @@ const Orders = () => {
 
             {/* Status Section */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
               <select
                 value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, status: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option>All Status</option>
@@ -325,17 +420,29 @@ const Orders = () => {
 
             {/* Products Section */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Products</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Products
+              </label>
               <div className="space-y-2">
-                {['Heavy Duty Tarpaulin', 'Waterproof Canvas', 'Industrial Vinyl Tarp', 'Custom Print Tarpaulin', 'Fire Retardant Tarp'].map((product) => (
+                {[
+                  "Heavy Duty Tarpaulin",
+                  "Waterproof Canvas",
+                  "Industrial Vinyl Tarp",
+                  "Custom Print Tarpaulin",
+                  "Fire Retardant Tarp",
+                ].map((product) => (
                   <label key={product} className="flex items-center">
                     <input
                       type="checkbox"
                       checked={filters.products.includes(product)}
-                      onChange={(e) => handleProductChange(product, e.target.checked)}
+                      onChange={(e) =>
+                        handleProductChange(product, e.target.checked)
+                      }
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{product}</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      {product}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -343,23 +450,39 @@ const Orders = () => {
 
             {/* Date Range Section */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date Range
+              </label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    Start Date
+                  </label>
                   <input
                     type="date"
                     value={filters.startDate}
-                    onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        startDate: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    End Date
+                  </label>
                   <input
                     type="date"
                     value={filters.endDate}
-                    onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        endDate: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -389,7 +512,7 @@ const Orders = () => {
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 disabled={loading}
               >
-                {loading ? 'Applying...' : 'Apply Filters'}
+                {loading ? "Applying..." : "Apply Filters"}
               </button>
             </div>
           </div>
