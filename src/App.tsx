@@ -9,10 +9,10 @@ import Orders from "./pages/Orders";
 import OrderBook from "./pages/OrderBook";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import Inventory from "./pages/Inventory";
-import AddRawMaterialPage from "./pages/AddRawMaterialPage"; // New import
-import AddFinishedProductPage from "./pages/AddFinishedProductPage"; // New import
-import InventoryReportPage from "./pages/InventoryReportPage"; // New import
-import LowStockAlertsPage from "./pages/LowStockAlertsPage"; // New import
+import AddRawMaterialPage from "./pages/AddRawMaterialPage"; 
+import AddFinishedProductPage from "./pages/AddFinishedProductPage"; 
+import InventoryReportPage from "./pages/InventoryReportPage"; 
+import LowStockAlertsPage from "./pages/LowStockAlertsPage"; 
 import Dispatch from "./pages/Dispatch";
 import CreateShipmentPage from "./pages/CreateShipmentPage";
 import Reports from "./pages/Reports";
