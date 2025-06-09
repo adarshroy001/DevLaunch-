@@ -1,30 +1,82 @@
-
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Users, UserPlus, Shield, Database, Bell } from "lucide-react";
+import {
+  Settings,
+  Users,
+  UserPlus,
+  Shield,
+  Database,
+  Bell,
+} from "lucide-react";
 
 // Mock data for users
 const MOCK_USERS = [
-  { id: 1, name: "John Admin", email: "john@tarpaulin.com", role: "Admin", status: "Active", lastLogin: "2025-05-23" },
-  { id: 2, name: "Sarah Manager", email: "sarah@tarpaulin.com", role: "Manager", status: "Active", lastLogin: "2025-05-22" },
-  { id: 3, name: "Mike Operator", email: "mike@tarpaulin.com", role: "Operator", status: "Active", lastLogin: "2025-05-23" },
-  { id: 4, name: "Lisa Sales", email: "lisa@tarpaulin.com", role: "Sales", status: "Inactive", lastLogin: "2025-05-20" }
+  {
+    id: 1,
+    name: "John Admin",
+    email: "john@tarpaulin.com",
+    role: "Admin",
+    status: "Active",
+    lastLogin: "2025-05-23",
+  },
+  {
+    id: 2,
+    name: "Sarah Manager",
+    email: "sarah@tarpaulin.com",
+    role: "Manager",
+    status: "Active",
+    lastLogin: "2025-05-22",
+  },
+  {
+    id: 3,
+    name: "Mike Operator",
+    email: "mike@tarpaulin.com",
+    role: "Operator",
+    status: "Active",
+    lastLogin: "2025-05-23",
+  },
+  {
+    id: 4,
+    name: "Lisa Sales",
+    email: "lisa@tarpaulin.com",
+    role: "Sales",
+    status: "Inactive",
+    lastLogin: "2025-05-20",
+  },
 ];
 
 const RoleBadge = ({ role }: { role: string }) => {
   const getRoleColor = () => {
     switch (role) {
-      case "Admin": return "bg-red-100 text-red-800";
-      case "Manager": return "bg-blue-100 text-blue-800";
-      case "Operator": return "bg-green-100 text-green-800";
-      case "Sales": return "bg-purple-100 text-purple-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "Admin":
+        return "bg-red-100 text-red-800";
+      case "Manager":
+        return "bg-blue-100 text-blue-800";
+      case "Operator":
+        return "bg-green-100 text-green-800";
+      case "Sales":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -33,7 +85,13 @@ const RoleBadge = ({ role }: { role: string }) => {
 
 const StatusBadge = ({ status }: { status: string }) => {
   return (
-    <Badge className={status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+    <Badge
+      className={
+        status === "Active"
+          ? "bg-green-100 text-green-800"
+          : "bg-gray-100 text-gray-800"
+      }
+    >
       {status}
     </Badge>
   );
@@ -47,7 +105,7 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Administration</h1>
@@ -74,7 +132,9 @@ const Admin = () => {
                       <Users className="w-5 h-5 mr-2" />
                       User Management
                     </CardTitle>
-                    <CardDescription>Manage user accounts and permissions</CardDescription>
+                    <CardDescription>
+                      Manage user accounts and permissions
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Table>
@@ -91,15 +151,27 @@ const Admin = () => {
                       <TableBody>
                         {MOCK_USERS.map((user) => (
                           <TableRow key={user.id}>
-                            <TableCell className="font-medium">{user.name}</TableCell>
+                            <TableCell className="font-medium">
+                              {user.name}
+                            </TableCell>
                             <TableCell>{user.email}</TableCell>
-                            <TableCell><RoleBadge role={user.role} /></TableCell>
-                            <TableCell><StatusBadge status={user.status} /></TableCell>
-                            <TableCell className="text-gray-500">{user.lastLogin}</TableCell>
+                            <TableCell>
+                              <RoleBadge role={user.role} />
+                            </TableCell>
+                            <TableCell>
+                              <StatusBadge status={user.status} />
+                            </TableCell>
+                            <TableCell className="text-gray-500">
+                              {user.lastLogin}
+                            </TableCell>
                             <TableCell>
                               <div className="flex space-x-2">
-                                <Button variant="outline" size="sm">Edit</Button>
-                                <Button variant="outline" size="sm">Delete</Button>
+                                <Button variant="outline" size="sm">
+                                  Edit
+                                </Button>
+                                <Button variant="outline" size="sm">
+                                  Delete
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -119,7 +191,9 @@ const Admin = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Full Name</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Full Name
+                    </label>
                     <Input
                       placeholder="Enter full name"
                       value={newUserName}
@@ -127,7 +201,9 @@ const Admin = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Email Address</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Email Address
+                    </label>
                     <Input
                       type="email"
                       placeholder="Enter email address"
@@ -136,8 +212,10 @@ const Admin = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Role</label>
-                    <select 
+                    <label className="block text-sm font-medium mb-1">
+                      Role
+                    </label>
+                    <select
                       className="w-full p-2 border rounded-md"
                       value={newUserRole}
                       onChange={(e) => setNewUserRole(e.target.value)}
@@ -163,36 +241,54 @@ const Admin = () => {
                     <Settings className="w-5 h-5 mr-2" />
                     System Configuration
                   </CardTitle>
-                  <CardDescription>Configure system-wide settings</CardDescription>
+                  <CardDescription>
+                    Configure system-wide settings
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center p-3 border rounded-md">
                     <div>
                       <h4 className="font-medium">Company Information</h4>
-                      <p className="text-sm text-gray-600">Update company details and branding</p>
+                      <p className="text-sm text-gray-600">
+                        Update company details and branding
+                      </p>
                     </div>
-                    <Button variant="outline" size="sm">Edit</Button>
+                    <Button variant="outline" size="sm">
+                      Edit
+                    </Button>
                   </div>
                   <div className="flex justify-between items-center p-3 border rounded-md">
                     <div>
                       <h4 className="font-medium">Production Settings</h4>
-                      <p className="text-sm text-gray-600">Configure production parameters</p>
+                      <p className="text-sm text-gray-600">
+                        Configure production parameters
+                      </p>
                     </div>
-                    <Button variant="outline" size="sm">Edit</Button>
+                    <Button variant="outline" size="sm">
+                      Edit
+                    </Button>
                   </div>
                   <div className="flex justify-between items-center p-3 border rounded-md">
                     <div>
                       <h4 className="font-medium">Pricing Rules</h4>
-                      <p className="text-sm text-gray-600">Manage pricing and discount rules</p>
+                      <p className="text-sm text-gray-600">
+                        Manage pricing and discount rules
+                      </p>
                     </div>
-                    <Button variant="outline" size="sm">Edit</Button>
+                    <Button variant="outline" size="sm">
+                      Edit
+                    </Button>
                   </div>
                   <div className="flex justify-between items-center p-3 border rounded-md">
                     <div>
                       <h4 className="font-medium">Security Settings</h4>
-                      <p className="text-sm text-gray-600">Password policies and authentication</p>
+                      <p className="text-sm text-gray-600">
+                        Password policies and authentication
+                      </p>
                     </div>
-                    <Button variant="outline" size="sm">Edit</Button>
+                    <Button variant="outline" size="sm">
+                      Edit
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -200,20 +296,28 @@ const Admin = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>System Status</CardTitle>
-                  <CardDescription>Current system health and performance</CardDescription>
+                  <CardDescription>
+                    Current system health and performance
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span>Server Status</span>
-                    <Badge className="bg-green-100 text-green-800">Online</Badge>
+                    <Badge className="bg-green-100 text-green-800">
+                      Online
+                    </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Database Status</span>
-                    <Badge className="bg-green-100 text-green-800">Connected</Badge>
+                    <Badge className="bg-green-100 text-green-800">
+                      Connected
+                    </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Last Backup</span>
-                    <span className="text-sm text-gray-600">2025-05-23 02:00 AM</span>
+                    <span className="text-sm text-gray-600">
+                      2025-05-23 02:00 AM
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>System Version</span>
@@ -235,7 +339,9 @@ const Admin = () => {
                   <Database className="w-5 h-5 mr-2" />
                   Data Management
                 </CardTitle>
-                <CardDescription>Backup, restore, and data maintenance operations</CardDescription>
+                <CardDescription>
+                  Backup, restore, and data maintenance operations
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -243,17 +349,27 @@ const Admin = () => {
                     <h3 className="font-medium">Backup Operations</h3>
                     <div className="space-y-2">
                       <Button className="w-full">Create Full Backup</Button>
-                      <Button variant="outline" className="w-full">Create Incremental Backup</Button>
-                      <Button variant="outline" className="w-full">Schedule Automatic Backup</Button>
+                      <Button variant="outline" className="w-full">
+                        Create Incremental Backup
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        Schedule Automatic Backup
+                      </Button>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <h3 className="font-medium">Data Maintenance</h3>
                     <div className="space-y-2">
-                      <Button variant="outline" className="w-full">Clean Temporary Files</Button>
-                      <Button variant="outline" className="w-full">Optimize Database</Button>
-                      <Button variant="outline" className="w-full">Export Data</Button>
+                      <Button variant="outline" className="w-full">
+                        Clean Temporary Files
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        Optimize Database
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        Export Data
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -263,11 +379,15 @@ const Admin = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                       <span>Full Backup - 2025-05-23 02:00 AM</span>
-                      <Button variant="outline" size="sm">Restore</Button>
+                      <Button variant="outline" size="sm">
+                        Restore
+                      </Button>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                       <span>Incremental - 2025-05-22 14:30 PM</span>
-                      <Button variant="outline" size="sm">Restore</Button>
+                      <Button variant="outline" size="sm">
+                        Restore
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -282,7 +402,9 @@ const Admin = () => {
                   <Bell className="w-5 h-5 mr-2" />
                   Notification Settings
                 </CardTitle>
-                <CardDescription>Configure system alerts and notifications</CardDescription>
+                <CardDescription>
+                  Configure system alerts and notifications
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
@@ -290,11 +412,19 @@ const Admin = () => {
                     <h3 className="font-medium mb-3">Email Notifications</h3>
                     <div className="space-y-2">
                       <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
+                        <input
+                          type="checkbox"
+                          defaultChecked
+                          className="rounded"
+                        />
                         <span>Low inventory alerts</span>
                       </label>
                       <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
+                        <input
+                          type="checkbox"
+                          defaultChecked
+                          className="rounded"
+                        />
                         <span>New order notifications</span>
                       </label>
                       <label className="flex items-center space-x-2">
@@ -302,7 +432,11 @@ const Admin = () => {
                         <span>Production completion alerts</span>
                       </label>
                       <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
+                        <input
+                          type="checkbox"
+                          defaultChecked
+                          className="rounded"
+                        />
                         <span>System maintenance notifications</span>
                       </label>
                     </div>
@@ -312,11 +446,15 @@ const Admin = () => {
                     <h3 className="font-medium mb-3">Alert Thresholds</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1">Low Stock Threshold (sq meters)</label>
+                        <label className="block text-sm font-medium mb-1">
+                          Low Stock Threshold (sq meters)
+                        </label>
                         <Input type="number" defaultValue="200" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">High Priority Order Amount (₹)</label>
+                        <label className="block text-sm font-medium mb-1">
+                          High Priority Order Amount (₹)
+                        </label>
                         <Input type="number" defaultValue="50000" />
                       </div>
                     </div>
