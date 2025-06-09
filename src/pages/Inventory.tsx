@@ -55,6 +55,7 @@ const Inventory = () => {
   const [category, setCategory] = useState<"all" | "raw" | "finished">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState({
     totalRawMaterials: 0,
     lowStockItems: 0,
@@ -79,18 +80,25 @@ const Inventory = () => {
     const fetchInitialData = async () => {
       try {
         setLoading(true);
+        setError(null);
+
         const [summaryData, alertsData] = await Promise.all([
           getInventorySummary(),
           getLowStockAlerts(),
         ]);
 
-        setSummary(summaryData);
-        setAlerts(alertsData);
+        setSummary({
+          totalRawMaterials: summaryData?.totalRawMaterials || 0,
+          lowStockItems: summaryData?.lowStockItems || 0,
+          topSellingProduct: summaryData?.topSellingProduct || "N/A",
+          finishedProducts: summaryData?.finishedProducts || 0,
+        });
+        setAlerts(Array.isArray(alertsData) ? alertsData : []);
 
-        // Load initial inventory based on category
         await loadInventory();
       } catch (error) {
         console.error("Failed to load inventory data:", error);
+        setError("Failed to load inventory data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -103,6 +111,8 @@ const Inventory = () => {
   const loadInventory = async (page = 1) => {
     try {
       setLoading(true);
+      setError(null);
+
       let response;
 
       if (searchQuery) {
@@ -117,15 +127,18 @@ const Inventory = () => {
           page,
           limit: pagination.limit,
         });
+
         setInventory({
-          rawMaterials: response.rawMaterials,
-          products: response.products,
+          rawMaterials: Array.isArray(response?.rawMaterials)
+            ? response.rawMaterials
+            : [],
+          products: Array.isArray(response?.products) ? response.products : [],
         });
         setPagination({
           ...pagination,
           page,
-          total: response.pagination.total,
-          totalPages: response.pagination.totalPages,
+          total: response?.pagination?.total || 0,
+          totalPages: response?.pagination?.totalPages || 1,
         });
       } else if (category === "raw") {
         response = await getRawMaterials({
@@ -133,10 +146,15 @@ const Inventory = () => {
           limit: pagination.limit,
         });
         setInventory({
-          rawMaterials: response.data,
+          rawMaterials: Array.isArray(response?.data) ? response.data : [],
           products: [],
         });
-        setPagination(response.pagination);
+        setPagination({
+          page,
+          limit: pagination.limit,
+          total: response?.pagination?.total || 0,
+          totalPages: response?.pagination?.totalPages || 1,
+        });
       } else if (category === "finished") {
         response = await getFinishedProducts({
           page,
@@ -144,9 +162,14 @@ const Inventory = () => {
         });
         setInventory({
           rawMaterials: [],
-          products: response.data,
+          products: Array.isArray(response?.data) ? response.data : [],
         });
-        setPagination(response.pagination);
+        setPagination({
+          page,
+          limit: pagination.limit,
+          total: response?.pagination?.total || 0,
+          totalPages: response?.pagination?.totalPages || 1,
+        });
       } else {
         const [rawResponse, finishedResponse] = await Promise.all([
           getRawMaterials({
@@ -160,22 +183,28 @@ const Inventory = () => {
         ]);
 
         setInventory({
-          rawMaterials: rawResponse.data,
-          products: finishedResponse.data,
+          rawMaterials: Array.isArray(rawResponse?.data)
+            ? rawResponse.data
+            : [],
+          products: Array.isArray(finishedResponse?.data)
+            ? finishedResponse.data
+            : [],
         });
         setPagination({
           ...pagination,
           page,
           total:
-            rawResponse.pagination.total + finishedResponse.pagination.total,
+            (rawResponse?.pagination?.total || 0) +
+            (finishedResponse?.pagination?.total || 0),
           totalPages: Math.max(
-            rawResponse.pagination.totalPages,
-            finishedResponse.pagination.totalPages
+            rawResponse?.pagination?.totalPages || 1,
+            finishedResponse?.pagination?.totalPages || 1
           ),
         });
       }
     } catch (error) {
       console.error("Failed to load inventory:", error);
+      setError("Failed to load inventory items. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -199,29 +228,37 @@ const Inventory = () => {
     loadInventory(newPage);
   };
 
-  // Format inventory items for display
+  // Format inventory items for display with proper null checks
   const getDisplayItems = () => {
+    // Ensure we have arrays to work with
+    const rawMaterials = Array.isArray(inventory.rawMaterials)
+      ? inventory.rawMaterials
+      : [];
+    const products = Array.isArray(inventory.products)
+      ? inventory.products
+      : [];
+
     if (category === "raw") {
-      return inventory.rawMaterials.map((item) => ({
+      return rawMaterials.map((item) => ({
         ...item,
         category: "Raw Material",
       }));
     } else if (category === "finished") {
-      return inventory.products.map((item) => ({
+      return products.map((item) => ({
         ...item,
         category: "Finished Product",
       }));
     } else {
       return [
-        ...inventory.rawMaterials.map((item) => ({
+        ...rawMaterials.map((item) => ({
           ...item,
           category: "Raw Material",
         })),
-        ...inventory.products.map((item) => ({
+        ...products.map((item) => ({
           ...item,
           category: "Finished Product",
         })),
-      ].sort((a, b) => a.name.localeCompare(b.name));
+      ].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     }
   };
 
@@ -233,6 +270,12 @@ const Inventory = () => {
         <h1 className="text-2xl font-bold mb-6">
           Tarpaulin Inventory Management
         </h1>
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
@@ -256,7 +299,7 @@ const Inventory = () => {
             />
             <StatsCard
               title="TOP SELLING"
-              value={summary.topSellingProduct || "N/A"}
+              value={summary.topSellingProduct}
               icon={TrendingUp}
               iconColor="text-green-100 bg-green-500"
             />
@@ -288,7 +331,9 @@ const Inventory = () => {
                       alert.status === "OUT_OF_STOCK"
                         ? "Out of Stock"
                         : "Low Stock"
-                    }: ${alert.name} (${alert.stock} ${alert.unit} remaining)`}
+                    }: ${alert.name || "Unknown Item"} (${alert.stock || 0} ${
+                      alert.unit || ""
+                    } remaining)`}
                   />
                 ))}
               </div>
@@ -412,21 +457,26 @@ const Inventory = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {getDisplayItems().length > 0 ? (
                       getDisplayItems().map((item) => (
-                        <tr key={item.itemId} className="hover:bg-gray-50">
+                        <tr
+                          key={item.itemId || item.id}
+                          className="hover:bg-gray-50"
+                        >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                            {item.itemId}
+                            {item.itemId || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {item.name}
+                            {item.name || "Unknown"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {item.category}
+                            {item.category || "Unknown"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {item.stock} {item.unit}
+                            {item.stock || 0} {item.unit || ""}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <StockStatusBadge status={item.status} />
+                            <StockStatusBadge
+                              status={item.status || "UNKNOWN"}
+                            />
                           </td>
                           <td className="px-10 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                             <button
