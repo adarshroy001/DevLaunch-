@@ -1,86 +1,81 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import StatsCard from "@/components/cards/StatsCard";
 import SearchBar from "@/components/ui/SearchBar";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
-import { orderBookMockOrders } from "@/data/orderBookMockData";
+import { getOrderBook, filterOrderBook, searchOrders } from "@/api/order";
 import { ShoppingCart, Clock, CheckCircle, Filter, X } from "lucide-react";
-import { filterOrders, getOrders } from "@/api/order";
 
 const OrderBook = () => {
   const [filter, setFilter] = useState("all");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [orders, setOrders] = useState();
-  const [error, setError] = useState();
-  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     status: "All Status",
     products: [],
     startDate: "",
     endDate: "",
-  });
-  const [pagination, setPagination] = useState({
-    total: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 0,
+    searchQuery: "",
   });
 
-  const handleApplyFilters = async () => {
+  // API state management
+  const [orders, setOrders] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    newOrders: 0,
+    inProduction: 0,
+    completed: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch order book data on component mount
+  useEffect(() => {
+    fetchOrderBook();
+  }, [filter, filters.searchQuery]);
+
+  const fetchOrderBook = async () => {
     try {
-      const params = {
-        page: 1,
-        limit: pagination.limit,
-        ...filters,
-      };
+      setLoading(true);
+      setError(null);
 
       let response;
-      try {
-        response = await filterOrders(params);
-      } catch (filterError: any) {
-        if (filterError.response?.status === 404) {
-          response = await getOrders(params);
-        } else {
-          throw filterError;
-        }
+      if (filters.searchQuery) {
+        response = await searchOrders(filters.searchQuery, {
+          status: filter === "all" ? undefined : filter.toUpperCase(),
+        });
+      } else if (filter === "all") {
+        response = await getOrderBook();
+      } else {
+        response = await filterOrderBook({
+          status: filter.toUpperCase(),
+          productName: filters.products[0],
+          startDate: filters.startDate,
+          endDate: filters.endDate,
+        });
       }
 
       if (response.success) {
-        setOrders(response.data.orders);
-        setPagination(response.data.pagination);
+        setOrders(response.data.orders || []);
+        if (response.data.summary) {
+          setStats({
+            newOrders: response.data.summary.newOrders || 0,
+            inProduction: response.data.summary.inProduction || 0,
+            completed: response.data.summary.completed || 0,
+          });
+        }
       } else {
-        throw new Error(response.message || "Failed to filter orders");
+        throw new Error(response.message || "Failed to fetch order book");
       }
-
-      setIsFilterModalOpen(false);
     } catch (err: any) {
-      console.error("Error filtering orders:", err);
-      setError(
-        err.response?.data?.message || err.message || "Failed to filter orders"
-      );
+      console.error("Error fetching order book:", err);
+      setError(err.message || "Failed to fetch order book");
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePageChange = (newPage) => {
-    setPagination((prev) => ({ ...prev, page: newPage }));
-  };
-
-  const handlePreviousPage = () => {
-    if (pagination.page > 1) {
-      handlePageChange(pagination.page - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (pagination.page < pagination.totalPages) {
-      handlePageChange(pagination.page + 1);
-    }
-  };
-
-  const handleProductChange = (product, checked) => {
+  const handleProductChange = (product: string, checked: boolean) => {
     setFilters((prev) => ({
       ...prev,
       products: checked
@@ -89,13 +84,31 @@ const OrderBook = () => {
     }));
   };
 
+  const handleApplyFilters = async () => {
+    try {
+      setLoading(true);
+      await fetchOrderBook();
+      setIsFilterModalOpen(false);
+    } catch (err: any) {
+      setError(err.message || "Failed to apply filters");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleClearAll = () => {
     setFilters({
       status: "All Status",
       products: [],
       startDate: "",
       endDate: "",
+      searchQuery: "",
     });
+    fetchOrderBook();
+  };
+
+  const handleSearch = (query: string) => {
+    setFilters((prev) => ({ ...prev, searchQuery: query }));
   };
 
   return (
@@ -108,19 +121,19 @@ const OrderBook = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <StatsCard
             title="NEW ORDERS"
-            value="15"
+            value={stats.newOrders.toString()}
             icon={ShoppingCart}
             iconColor="text-blue-100 bg-blue-500"
           />
           <StatsCard
             title="IN PRODUCTION"
-            value="28"
+            value={stats.inProduction.toString()}
             icon={Clock}
             iconColor="text-amber-100 bg-amber-500"
           />
           <StatsCard
             title="COMPLETED TODAY"
-            value="12"
+            value={stats.completed.toString()}
             icon={CheckCircle}
             iconColor="text-green-100 bg-green-500"
           />
@@ -141,6 +154,26 @@ const OrderBook = () => {
                   All Orders
                 </button>
                 <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "in_production"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("in_production")}
+                >
+                  In Production
+                </button>
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "completed"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("completed")}
+                >
+                  Completed
+                </button>
+                <button
                   className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
                   onClick={() => setIsFilterModalOpen(true)}
                 >
@@ -152,10 +185,18 @@ const OrderBook = () => {
                 <SearchBar
                   placeholder="Search orders..."
                   className="w-full sm:w-64"
+                  onSearch={handleSearch}
                 />
               </div>
             </div>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="px-6 py-4 bg-red-50 border-l-4 border-red-400">
+              <p className="text-red-700">{error}</p>
+            </div>
+          )}
 
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -182,33 +223,57 @@ const OrderBook = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {orderBookMockOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                      {order.id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {order.customer}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.date}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <OrderStatusBadge status={order.status} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.items}
-                    </td>
-                    <td className="pr-8 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link
-                        to={`/orderbook/${order.id}`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View
-                      </Link>
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      Loading orders...
                     </td>
                   </tr>
-                ))}
+                ) : orders.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No orders found
+                    </td>
+                  </tr>
+                ) : (
+                  orders.map((order) => (
+                    <tr key={order.orderId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                        {order.orderId}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {order.customer ||
+                          order.customer?.company ||
+                          order.customer?.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.date ||
+                          new Date(order.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <OrderStatusBadge status={order.status} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.product ||
+                          order.items
+                            ?.map((item: any) => item.product?.name)
+                            .join(", ") ||
+                          "N/A"}
+                      </td>
+                      <td className="pr-8 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Link
+                          to={`/orderbook/${order.orderId}`}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -216,17 +281,8 @@ const OrderBook = () => {
           <div className="px-6 py-4 border-t">
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-700">
-                Showing {orderBookMockOrders.length} of{" "}
-                {orderBookMockOrders.length} orders
+                Showing {orders.length} of {orders.length} orders
               </p>
-              <div className="flex space-x-2">
-                <button className="px-3 py-1 border rounded text-sm bg-white hover:bg-gray-50">
-                  Previous
-                </button>
-                <button className="px-3 py-1 border rounded text-sm bg-blue-600 text-white hover:bg-blue-700">
-                  Next
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -358,8 +414,9 @@ const OrderBook = () => {
               <button
                 onClick={handleApplyFilters}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                disabled={loading}
               >
-                Apply Filters
+                {loading ? "Applying..." : "Apply Filters"}
               </button>
             </div>
           </div>

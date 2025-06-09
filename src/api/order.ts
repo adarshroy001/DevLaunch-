@@ -1,77 +1,162 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
-const api = axios.create({
-  baseURL: `${API_BASE_URL}/orders`,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Create new order
-export const createOrder = async (data: any) => {
+// Create a new order
+export const createOrder = async (orderData: any) => {
   try {
-    const response = await api.post("/", data);
+    const response = await axios.post(`${API_BASE_URL}/orders`, orderData);
     return response.data;
-  } catch (error: unknown) {
-    console.error("Failed to create order:", error);
-    throw error;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to create order");
   }
 };
 
-// Get all orders (with pagination and optional filters via query params)
-export const getOrders = async (params?: any) => {
+// Get all orders with pagination and filters
+export const getOrders = async (params: any = {}) => {
   try {
-    const response = await api.get("/", { params });
+    const response = await axios.get(`${API_BASE_URL}/orders`, { params });
     return response.data;
-  } catch (error: unknown) {
-    console.error("Failed to fetch orders:", error);
-    throw error;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to fetch orders");
+  }
+};
+
+// Get order book data
+export const getOrderBook = async (filter?: string) => {
+  try {
+    const params = filter ? { filter } : {};
+    const response = await axios.get(`${API_BASE_URL}/orders/book`, { params });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch order book"
+    );
+  }
+};
+
+// Get order details
+export const getOrderDetails = async (orderId: string) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/orders/${orderId}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch order details"
+    );
+  }
+};
+
+// Update order status
+export const updateOrderStatus = async (orderId: string, status: string) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/orders/${orderId}/status`,
+      { status }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to update order status"
+    );
+  }
+};
+
+// Update order products
+export const updateOrderProducts = async (orderId: string, products: any[]) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/orders/${orderId}/products`,
+      { products }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to update order products"
+    );
+  }
+};
+
+// Get pending orders
+export const getPendingOrders = async (params: any = {}) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/orders/pending`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch pending orders"
+    );
+  }
+};
+
+// Get dispatched orders
+export const getDispatchedOrders = async (params: any = {}) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/orders/dispatched`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch dispatched orders"
+    );
+  }
+};
+
+// Get cancelled orders
+export const getCancelledOrders = async (params: any = {}) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/orders/cancelled`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch cancelled orders"
+    );
   }
 };
 
 // Filter orders
-export const filterOrders = async (params?: any) => {
+export const filterOrders = async (params: any = {}) => {
   try {
-    const response = await api.get("/filter/getBook", { params });
+    const response = await axios.get(`${API_BASE_URL}/orders/filter`, {
+      params,
+    });
     return response.data;
   } catch (error: any) {
-    console.error("Failed to filter orders:", error);
-    throw error;
+    throw new Error(error.response?.data?.message || "Failed to filter orders");
+  }
+};
+
+// Filter order book
+export const filterOrderBook = async (params: any = {}) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/orders/filter/getBook`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to filter order book"
+    );
   }
 };
 
 // Search orders
-export const searchOrders = async (params: {
-  query?: string;
-  page?: number;
-  limit?: number;
-  status?: string;
-
-  [key: string]: any;
-}) => {
+export const searchOrders = async (query: string, params: any = {}) => {
   try {
-    // Remove undefined values from params
-    const cleanParams = Object.fromEntries(
-      Object.entries(params).filter(([_, value]) => value !== undefined)
+    const response = await axios.get(
+      `${API_BASE_URL}/orders/search-orders-book`,
+      {
+        params: { ...params, query },
+      }
     );
-
-    const response = await api.get("/search-orders-book", {
-      params: cleanParams,
-    });
     return response.data;
   } catch (error: any) {
-    console.error("Failed to search orders:", error);
-
-    // Provide more structured error information
-    const apiError = {
-      message: error.response?.data?.message || "Search failed",
-      status: error.response?.status || 500,
-      data: error.response?.data || null,
-    };
-
-    throw apiError;
+    throw new Error(error.response?.data?.message || "Failed to search orders");
   }
 };

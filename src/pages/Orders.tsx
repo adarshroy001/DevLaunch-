@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Filter, X, Search } from "lucide-react";
+import { Plus, Filter, X } from "lucide-react";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
 import { Link } from "react-router-dom";
 import {
@@ -20,26 +20,27 @@ import {
   getOrders,
   searchOrders,
   filterOrders,
+  getDispatchedOrders,
+  getPendingOrders,
+  getCancelledOrders,
 } from "@/api/order";
 
 const Orders = () => {
   const [filter, setFilter] = useState("all");
   const [isAddOrderOpen, setIsAddOrderOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-
   const [filters, setFilters] = useState({
     status: "All Status",
     products: [],
     startDate: "",
     endDate: "",
+    searchQuery: "",
   });
 
   // API state management
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
@@ -47,16 +48,12 @@ const Orders = () => {
     totalPages: 0,
   });
 
-  // Fetch orders on component mount and when page changes
+  // Fetch orders on component mount and when filters change
   useEffect(() => {
-    if (searchQuery) {
-      handleSearch();
-    } else {
-      fetchOrders();
-    }
-  }, [pagination.page]);
+    fetchOrders();
+  }, [pagination.page, filter, filters.searchQuery]);
 
-  const fetchOrders = async (filterParams = {}) => {
+  const fetchOrders = async (filterParams: any = {}) => {
     try {
       setLoading(true);
       setError(null);
@@ -67,7 +64,18 @@ const Orders = () => {
         ...filterParams,
       };
 
-      const response = await getOrders(params);
+      let response;
+      if (filters.searchQuery) {
+        response = await searchOrders(filters.searchQuery, params);
+      } else if (filter === "pending") {
+        response = await getPendingOrders(params);
+      } else if (filter === "dispatched") {
+        response = await getDispatchedOrders(params);
+      } else if (filter === "cancelled") {
+        response = await getCancelledOrders(params);
+      } else {
+        response = await getOrders(params);
+      }
 
       if (response.success) {
         setOrders(response.data.orders);
@@ -75,7 +83,7 @@ const Orders = () => {
       } else {
         throw new Error(response.message || "Failed to fetch orders");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching orders:", err);
       setError(err.message || "Failed to fetch orders");
       setOrders([]);
@@ -84,53 +92,22 @@ const Orders = () => {
     }
   };
 
-  // Search functionality
-  const handleSearch = async () => {
-    // Reset to first page when searching
-    const searchParams = {
-      query: searchQuery.trim(),
-      page: 1,
-      limit: pagination.limit,
-      // Include any additional filters from UI
-      status: filters.status,
-    };
-
+  const handleCreateOrder = async (orderData: any) => {
     try {
-      setIsSearching(true);
-      setError(null);
-
-      // If search query is empty, fetch all orders with current filters
-      if (!searchParams.query) {
-        await fetchOrders(searchParams);
-        return;
-      }
-
-      const response = await searchOrders(searchParams);
-
+      setLoading(true);
+      const response = await createOrder(orderData);
       if (response.success) {
-        setOrders(response.data.orders);
-        setPagination(response.data.pagination);
-      } else {
-        throw new Error(response.message || "Search failed");
+        setIsAddOrderOpen(false);
+        fetchOrders(); // Refresh the orders list
       }
-    } catch (err) {
-      console.error("Error searching orders:", err);
-      setError(err.message || "Search failed");
-      setOrders([]);
-      setPagination((prev) => ({ ...prev, total: 0, totalPages: 0 }));
+    } catch (err: any) {
+      setError(err.message || "Failed to create order");
     } finally {
-      setIsSearching(false);
+      setLoading(false);
     }
   };
 
-  // Handle pressing Enter key in search input
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
-
-  const handleProductChange = (product, checked) => {
+  const handleProductChange = (product: string, checked: boolean) => {
     setFilters((prev) => ({
       ...prev,
       products: checked
@@ -147,7 +124,7 @@ const Orders = () => {
       const filterParams: any = {};
 
       if (filters.status !== "All Status") {
-        filterParams.status = filters.status.toLowerCase();
+        filterParams.status = filters.status.toUpperCase().replace(" ", "_");
       }
 
       if (filters.products.length > 0) {
@@ -163,21 +140,12 @@ const Orders = () => {
       }
 
       const params = {
-        page: 1,
+        page: 1, // Reset to first page when filtering
         limit: pagination.limit,
         ...filterParams,
       };
 
-      let response;
-      try {
-        response = await filterOrders(params);
-      } catch (filterError: any) {
-        if (filterError.response?.status === 404) {
-          response = await getOrders(params);
-        } else {
-          throw filterError;
-        }
-      }
+      const response = await filterOrders(params);
 
       if (response.success) {
         setOrders(response.data.orders);
@@ -189,9 +157,7 @@ const Orders = () => {
       setIsFilterModalOpen(false);
     } catch (err: any) {
       console.error("Error filtering orders:", err);
-      setError(
-        err.response?.data?.message || err.message || "Failed to filter orders"
-      );
+      setError(err.message || "Failed to filter orders");
     } finally {
       setLoading(false);
     }
@@ -203,12 +169,12 @@ const Orders = () => {
       products: [],
       startDate: "",
       endDate: "",
+      searchQuery: "",
     });
-    setSearchQuery("");
     fetchOrders();
   };
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
@@ -222,6 +188,11 @@ const Orders = () => {
     if (pagination.page < pagination.totalPages) {
       handlePageChange(pagination.page + 1);
     }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchOrders();
   };
 
   return (
@@ -238,47 +209,78 @@ const Orders = () => {
                 Add New Order
               </Button>
             </DialogTrigger>
-            <AddOrderForm onClose={() => setIsAddOrderOpen(false)} />
+            <AddOrderForm
+              onClose={() => setIsAddOrderOpen(false)}
+              onSubmit={handleCreateOrder}
+            />
           </Dialog>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm">
-          {/* Search and Filter Section */}
+          {/* Tabs and Search */}
           <div className="border-b border-gray-200 p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Search Input */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex space-x-4">
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "all"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("all")}
+                >
+                  All Orders
+                </button>
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "pending"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("pending")}
+                >
+                  Pending
+                </button>
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "dispatched"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("dispatched")}
+                >
+                  Dispatched
+                </button>
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "cancelled"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("cancelled")}
+                >
+                  Cancelled
+                </button>
+                <button
+                  className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
+                  onClick={() => setIsFilterModalOpen(true)}
+                >
+                  <Filter className="w-4 h-4" />
+                  Filter
+                </button>
+              </div>
+              <form onSubmit={handleSearch} className="flex gap-2">
                 <Input
                   type="text"
-                  placeholder="Search orders by ID, customer, or product..."
-                  className="pl-10 pr-4 py-2"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
+                  placeholder="Search orders..."
+                  value={filters.searchQuery}
+                  onChange={(e) =>
+                    setFilters({ ...filters, searchQuery: e.target.value })
+                  }
+                  className="w-full sm:w-64"
                 />
-                {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery("");
-                      fetchOrders();
-                    }}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Filter Button */}
-              <Button
-                variant="outline"
-                onClick={() => setIsFilterModalOpen(true)}
-                className="flex items-center gap-2"
-              >
-                <Filter className="w-4 h-4" />
-                Filter
-              </Button>
+                <Button type="submit">Search</Button>
+              </form>
             </div>
           </div>
 
@@ -304,10 +306,10 @@ const Orders = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading || isSearching ? (
+                {loading ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8">
-                      {isSearching ? "Searching..." : "Loading orders..."}
+                      Loading orders...
                     </TableCell>
                   </TableRow>
                 ) : orders.length === 0 ? (
@@ -316,9 +318,7 @@ const Orders = () => {
                       colSpan={7}
                       className="text-center py-8 text-gray-500"
                     >
-                      {searchQuery
-                        ? "No matching orders found"
-                        : "No orders found"}
+                      No orders found
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -327,11 +327,28 @@ const Orders = () => {
                       <TableCell className="font-medium text-blue-600">
                         {order.orderId}
                       </TableCell>
-                      <TableCell>{order.customerName}</TableCell>
-                      <TableCell>{order.product}</TableCell>
-                      <TableCell className="pl-10">{order.quantity}</TableCell>
+                      <TableCell>
+                        {order.customerName ||
+                          order.customer?.company ||
+                          order.customer?.name}
+                      </TableCell>
+                      <TableCell>
+                        {order.product ||
+                          order.items
+                            ?.map((item: any) => item.product?.name)
+                            .join(", ") ||
+                          "N/A"}
+                      </TableCell>
+                      <TableCell className="pl-10">
+                        {order.quantity ||
+                          order.items?.reduce(
+                            (sum: number, item: any) => sum + item.quantity,
+                            0
+                          )}
+                      </TableCell>
                       <TableCell className="text-gray-500">
-                        {order.date}
+                        {order.date ||
+                          new Date(order.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
                         <OrderStatusBadge status={order.status} />
@@ -362,7 +379,7 @@ const Orders = () => {
                   variant="outline"
                   size="sm"
                   onClick={handlePreviousPage}
-                  disabled={pagination.page <= 1 || loading || isSearching}
+                  disabled={pagination.page <= 1 || loading}
                 >
                   Previous
                 </Button>
@@ -370,11 +387,7 @@ const Orders = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleNextPage}
-                  disabled={
-                    pagination.page >= pagination.totalPages ||
-                    loading ||
-                    isSearching
-                  }
+                  disabled={pagination.page >= pagination.totalPages || loading}
                 >
                   Next
                 </Button>
@@ -412,7 +425,8 @@ const Orders = () => {
               >
                 <option>All Status</option>
                 <option>Pending</option>
-                <option>Dispatched</option>
+                <option>Processing</option>
+                <option>In Production</option>
                 <option>Completed</option>
                 <option>Cancelled</option>
               </select>
