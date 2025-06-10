@@ -3,12 +3,27 @@ import Navbar from "@/components/layout/Navbar";
 import AddOrderForm from "@/components/forms/AddOrderForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Filter, X } from "lucide-react";
 import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
 import { Link } from "react-router-dom";
-import { createOrder, getOrders, searchOrders, filterOrders } from "@/api/order";
+import {
+  createOrder,
+  getOrders,
+  searchOrders,
+  filterOrders,
+  getDispatchedOrders,
+  getPendingOrders,
+  getCancelledOrders,
+} from "@/api/order";
 
 const Orders = () => {
   const [filter, setFilter] = useState("all");
@@ -18,13 +33,14 @@ const Orders = () => {
     status: "All Status",
     products: [],
     startDate: "",
-    endDate: ""
+    endDate: "",
+    searchQuery: "",
   });
 
   // API state management
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
@@ -32,45 +48,71 @@ const Orders = () => {
     totalPages: 0,
   });
 
-  // Fetch orders on component mount
+  // Fetch orders on component mount and when filters change
   useEffect(() => {
     fetchOrders();
-  }, [pagination.page]);
+  }, [pagination.page, filter, filters.searchQuery]);
 
-  const fetchOrders = async (filterParams = {}) => {
+  const fetchOrders = async (filterParams: any = {}) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = {
         page: pagination.page,
         limit: pagination.limit,
         ...filterParams,
       };
 
-      const response = await getOrders(params);
-      
+      let response;
+      if (filters.searchQuery) {
+        response = await searchOrders(filters.searchQuery, params);
+      } else if (filter === "pending") {
+        response = await getPendingOrders(params);
+      } else if (filter === "dispatched") {
+        response = await getDispatchedOrders(params);
+      } else if (filter === "cancelled") {
+        response = await getCancelledOrders(params);
+      } else {
+        response = await getOrders(params);
+      }
+
       if (response.success) {
         setOrders(response.data.orders);
         setPagination(response.data.pagination);
       } else {
-        throw new Error(response.message || 'Failed to fetch orders');
+        throw new Error(response.message || "Failed to fetch orders");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching orders:", err);
-      setError(err.message || 'Failed to fetch orders');
+      setError(err.message || "Failed to fetch orders");
       setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleProductChange = (product, checked) => {
-    setFilters(prev => ({
+  const handleCreateOrder = async (orderData: any) => {
+    try {
+      setLoading(true);
+      const response = await createOrder(orderData);
+      if (response.success) {
+        setIsAddOrderOpen(false);
+        fetchOrders(); // Refresh the orders list
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to create order");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProductChange = (product: string, checked: boolean) => {
+    setFilters((prev) => ({
       ...prev,
       products: checked
         ? [...prev.products, product]
-        : prev.products.filter(p => p !== product)
+        : prev.products.filter((p) => p !== product),
     }));
   };
 
@@ -78,23 +120,21 @@ const Orders = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const filterParams: any = {};
-      
-      // Map UI filters to API parameters
+
       if (filters.status !== "All Status") {
-        filterParams.status = filters.status.toLowerCase();
+        filterParams.status = filters.status.toUpperCase().replace(" ", "_");
       }
-      
+
       if (filters.products.length > 0) {
-        // Use the first product as productType (API expects single product filter)
         filterParams.productType = filters.products[0];
       }
-      
+
       if (filters.startDate) {
         filterParams.startDate = filters.startDate;
       }
-      
+
       if (filters.endDate) {
         filterParams.endDate = filters.endDate;
       }
@@ -105,30 +145,19 @@ const Orders = () => {
         ...filterParams,
       };
 
-      // Try filterOrders first, fallback to getOrders if filter endpoint doesn't exist
-      let response;
-      try {
-        response = await filterOrders(params);
-      } catch (filterError: any) {
-        if (filterError.response?.status === 404) {
-          console.log("Filter endpoint not found, using getOrders with params");
-          response = await getOrders(params);
-        } else {
-          throw filterError;
-        }
-      }
-      
+      const response = await filterOrders(params);
+
       if (response.success) {
         setOrders(response.data.orders);
         setPagination(response.data.pagination);
       } else {
-        throw new Error(response.message || 'Failed to filter orders');
+        throw new Error(response.message || "Failed to filter orders");
       }
-      
+
       setIsFilterModalOpen(false);
     } catch (err: any) {
       console.error("Error filtering orders:", err);
-      setError(err.response?.data?.message || err.message || 'Failed to filter orders');
+      setError(err.message || "Failed to filter orders");
     } finally {
       setLoading(false);
     }
@@ -139,14 +168,14 @@ const Orders = () => {
       status: "All Status",
       products: [],
       startDate: "",
-      endDate: ""
+      endDate: "",
+      searchQuery: "",
     });
-    // Fetch all orders without filters
     fetchOrders();
   };
 
-  const handlePageChange = (newPage) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
+  const handlePageChange = (newPage: number) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
   const handlePreviousPage = () => {
@@ -159,6 +188,11 @@ const Orders = () => {
     if (pagination.page < pagination.totalPages) {
       handlePageChange(pagination.page + 1);
     }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchOrders();
   };
 
   return (
@@ -175,36 +209,79 @@ const Orders = () => {
                 Add New Order
               </Button>
             </DialogTrigger>
-            <AddOrderForm onClose={() => setIsAddOrderOpen(false)} />
+            <AddOrderForm
+              onClose={() => setIsAddOrderOpen(false)}
+              onSubmit={handleCreateOrder}
+            />
           </Dialog>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm">
-          {/* Tabs */}
-          <div className="border-b border-gray-200">
-            <nav className="flex py-0 px-6">
-              <button 
-                  className={`px-3 my-2 text-sm rounded-md ${filter === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                  onClick={() => setFilter('all')}
+          {/* Tabs and Search */}
+          <div className="border-b border-gray-200 p-4">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex space-x-4">
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "all"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("all")}
                 >
                   All Orders
                 </button>
-              {/* Filter Section - Updated */}
-              <div className="my-2">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                  <div className="flex space-x-4">
-                    <button
-                      className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
-                      onClick={() => setIsFilterModalOpen(true)}
-                    >
-                      <Filter className="w-4 h-4" />
-                      Filter
-                    </button>
-                  </div>
-                </div>
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "pending"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("pending")}
+                >
+                  Pending
+                </button>
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "dispatched"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("dispatched")}
+                >
+                  Dispatched
+                </button>
+                <button
+                  className={`px-3 py-1.5 text-sm rounded-md ${
+                    filter === "cancelled"
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setFilter("cancelled")}
+                >
+                  Cancelled
+                </button>
+                <button
+                  className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
+                  onClick={() => setIsFilterModalOpen(true)}
+                >
+                  <Filter className="w-4 h-4" />
+                  Filter
+                </button>
               </div>
-
-            </nav>
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Search orders..."
+                  value={filters.searchQuery}
+                  onChange={(e) =>
+                    setFilters({ ...filters, searchQuery: e.target.value })
+                  }
+                  className="w-full sm:w-64"
+                />
+                <Button type="submit">Search</Button>
+              </form>
+            </div>
           </div>
 
           {/* Error Message */}
@@ -237,23 +314,50 @@ const Orders = () => {
                   </TableRow>
                 ) : orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                    <TableCell
+                      colSpan={7}
+                      className="text-center py-8 text-gray-500"
+                    >
                       No orders found
                     </TableCell>
                   </TableRow>
                 ) : (
                   orders.map((order) => (
                     <TableRow key={order.orderId}>
-                      <TableCell className="font-medium text-blue-600">{order.orderId}</TableCell>
-                      <TableCell>{order.customerName}</TableCell>
-                      <TableCell>{order.product}</TableCell>
-                      <TableCell className="pl-10">{order.quantity}</TableCell>
-                      <TableCell className="text-gray-500">{order.date}</TableCell>
+                      <TableCell className="font-medium text-blue-600">
+                        {order.orderId}
+                      </TableCell>
+                      <TableCell>
+                        {order.customerName ||
+                          order.customer?.company ||
+                          order.customer?.name}
+                      </TableCell>
+                      <TableCell>
+                        {order.product ||
+                          order.items
+                            ?.map((item: any) => item.product?.name)
+                            .join(", ") ||
+                          "N/A"}
+                      </TableCell>
+                      <TableCell className="pl-10">
+                        {order.quantity ||
+                          order.items?.reduce(
+                            (sum: number, item: any) => sum + item.quantity,
+                            0
+                          )}
+                      </TableCell>
+                      <TableCell className="text-gray-500">
+                        {order.date ||
+                          new Date(order.createdAt).toLocaleDateString()}
+                      </TableCell>
                       <TableCell>
                         <OrderStatusBadge status={order.status} />
                       </TableCell>
                       <TableCell>
-                        <Link to={`/orderbook/${order.orderId}`} className="text-blue-600 hover:text-blue-900 text-center px-4">
+                        <Link
+                          to={`/orderbook/${order.orderId}`}
+                          className="text-blue-600 hover:text-blue-900 text-center px-4"
+                        >
                           View
                         </Link>
                       </TableCell>
@@ -271,16 +375,16 @@ const Orders = () => {
                 Showing {orders.length} of {pagination.total} orders
               </p>
               <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={handlePreviousPage}
                   disabled={pagination.page <= 1 || loading}
                 >
                   Previous
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={handleNextPage}
                   disabled={pagination.page >= pagination.totalPages || loading}
@@ -309,15 +413,20 @@ const Orders = () => {
 
             {/* Status Section */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
               <select
                 value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, status: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option>All Status</option>
                 <option>Pending</option>
-                <option>Dispatched</option>
+                <option>Processing</option>
+                <option>In Production</option>
                 <option>Completed</option>
                 <option>Cancelled</option>
               </select>
@@ -325,17 +434,29 @@ const Orders = () => {
 
             {/* Products Section */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Products</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Products
+              </label>
               <div className="space-y-2">
-                {['Heavy Duty Tarpaulin', 'Waterproof Canvas', 'Industrial Vinyl Tarp', 'Custom Print Tarpaulin', 'Fire Retardant Tarp'].map((product) => (
+                {[
+                  "Heavy Duty Tarpaulin",
+                  "Waterproof Canvas",
+                  "Industrial Vinyl Tarp",
+                  "Custom Print Tarpaulin",
+                  "Fire Retardant Tarp",
+                ].map((product) => (
                   <label key={product} className="flex items-center">
                     <input
                       type="checkbox"
                       checked={filters.products.includes(product)}
-                      onChange={(e) => handleProductChange(product, e.target.checked)}
+                      onChange={(e) =>
+                        handleProductChange(product, e.target.checked)
+                      }
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{product}</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      {product}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -343,23 +464,39 @@ const Orders = () => {
 
             {/* Date Range Section */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date Range
+              </label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    Start Date
+                  </label>
                   <input
                     type="date"
                     value={filters.startDate}
-                    onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        startDate: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    End Date
+                  </label>
                   <input
                     type="date"
                     value={filters.endDate}
-                    onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        endDate: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -389,7 +526,7 @@ const Orders = () => {
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 disabled={loading}
               >
-                {loading ? 'Applying...' : 'Apply Filters'}
+                {loading ? "Applying..." : "Apply Filters"}
               </button>
             </div>
           </div>
