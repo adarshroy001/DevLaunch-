@@ -232,36 +232,6 @@ const Orders = () => {
                   All Orders
                 </button>
                 <button
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    filter === "pending"
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setFilter("pending")}
-                >
-                  Pending
-                </button>
-                <button
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    filter === "dispatched"
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setFilter("dispatched")}
-                >
-                  Dispatched
-                </button>
-                <button
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    filter === "cancelled"
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setFilter("cancelled")}
-                >
-                  Cancelled
-                </button>
-                <button
                   className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
                   onClick={() => setIsFilterModalOpen(true)}
                 >
@@ -277,9 +247,9 @@ const Orders = () => {
                   onChange={(e) =>
                     setFilters({ ...filters, searchQuery: e.target.value })
                   }
-                  className="w-full sm:w-64"
+                  className="w-full sm:w-64 "
                 />
-                <Button type="submit">Search</Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Search</Button>
               </form>
             </div>
           </div>

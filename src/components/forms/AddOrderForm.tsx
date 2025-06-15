@@ -8,7 +8,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, X, Edit, Trash2 } from "lucide-react";
 
-const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
+const AddOrderForm = ({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (orderData: any) => Promise<void>;
+}) => {
   const [formData, setFormData] = useState({
     customerName: "",
     customerAddress: "",
@@ -449,7 +455,7 @@ const AddOrderForm = ({ onClose }: { onClose: () => void }) => {
               Cancel
             </Button>
             <Button
-              onClick={handleItemSubmit}
+              onClick={onSubmit}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {editingItemIndex !== null ? "Update Item" : "Add Item"}

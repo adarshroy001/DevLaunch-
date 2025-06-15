@@ -154,26 +154,6 @@ const OrderBook = () => {
                   All Orders
                 </button>
                 <button
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    filter === "in_production"
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setFilter("in_production")}
-                >
-                  In Production
-                </button>
-                <button
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    filter === "completed"
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setFilter("completed")}
-                >
-                  Completed
-                </button>
-                <button
                   className="px-3 py-1.5 text-sm rounded-md text-gray-600 hover:bg-gray-100 flex items-center gap-2"
                   onClick={() => setIsFilterModalOpen(true)}
                 >
@@ -185,7 +165,7 @@ const OrderBook = () => {
                 <SearchBar
                   placeholder="Search orders..."
                   className="w-full sm:w-64"
-                  onSearch={handleSearch}
+                  // onSearch={handleSearch}
                 />
               </div>
             </div>
