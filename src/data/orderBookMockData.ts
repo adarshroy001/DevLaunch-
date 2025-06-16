@@ -3,13 +3,13 @@ import type { OrderBookEntry } from "@/types";
 
 export const ORDER_BOOK_STATUSES = ["Processing", "Shipped", "Completed", "Delayed", "Cancelled"] as const;
 
-export const orderBookMockOrders: OrderBookEntry[] = [
-  { id: "ORD123", customer: "Construction Co. Ltd", date: "2025-05-20", status: "Processing", total: "₹24,600", items: "Heavy Duty Tarpaulin 20x30" },
-  { id: "ORD124", customer: "Warehouse Solutions", date: "2025-05-20", status: "Shipped", total: "₹18,950", items: "Waterproof Canvas 15x25" },
-  { id: "ORD125", customer: "Industrial Corp", date: "2025-05-20", status: "Completed", total: "₹53,275", items: "Custom Print Tarpaulin" },
-  { id: "ORD126", customer: "Farm Equipment Co", date: "2025-05-19", status: "Processing", total: "₹7,825", items: "Agricultural Cover 12x18" },
-  { id: "ORD127", customer: "Event Management Ltd", date: "2025-05-19", status: "Delayed", total: "₹31,520", items: "Fire Retardant Tarp 25x40" }
-];
+// export const orderBookMockOrders: OrderBookEntry[] = [
+//   { id: "ORD123", customer: "Construction Co. Ltd", date: "2025-05-20", status: "Processing", total: "₹24,600", items: "Heavy Duty Tarpaulin 20x30" },
+//   { id: "ORD124", customer: "Warehouse Solutions", date: "2025-05-20", status: "Shipped", total: "₹18,950", items: "Waterproof Canvas 15x25" },
+//   { id: "ORD125", customer: "Industrial Corp", date: "2025-05-20", status: "Completed", total: "₹53,275", items: "Custom Print Tarpaulin" },
+//   { id: "ORD126", customer: "Farm Equipment Co", date: "2025-05-19", status: "Processing", total: "₹7,825", items: "Agricultural Cover 12x18" },
+//   { id: "ORD127", customer: "Event Management Ltd", date: "2025-05-19", status: "Delayed", total: "₹31,520", items: "Fire Retardant Tarp 25x40" }
+// ];
 
 // Mock data for Tarpaulin Order Form
 export const mockOrders = [
@@ -20,27 +20,27 @@ export const mockOrders = [
     date: "2024-01-15",
     createdAt: "2024-01-15T09:30:00.000Z",
     updatedAt: "2024-01-16T14:20:00.000Z",
-    
+
     // Customer Information
     customerName: "Rajesh Construction Co.",
     customerAddress: "Plot No. 45, Industrial Area, Phase 2, Sector 18, Gurgaon, Haryana - 122015",
     customerWhatsapp: "+91 9876543210",
-    
+
     // Sales Information
     salesPerson: "rajesh",
-    
-    // Brand (if needed)
-    brand: "Premium Tarp",
-    
+
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
+
     // Delivery Options (only one should be true)
     xFactory: false,
     forDelivery: true,
     transport: false,
-    
+
     // Transport Details
     transportName: "Swift Logistics",
     transportContact: "+91 9988776655",
-    
+
     // Items array
     items: [
       {
@@ -71,19 +71,20 @@ export const mockOrders = [
       }
     ]
   },
-  
+
   {
     id: "ORD-2024-002",
     status: "Completed",
     date: "2024-01-12",
     createdAt: "2024-01-12T11:15:00.000Z",
     updatedAt: "2024-01-18T16:45:00.000Z",
-    
+
     customerName: "Sharma Trading Company",
     customerAddress: "12/3, Main Market, Karol Bagh, New Delhi - 110005",
     customerWhatsapp: "+91 8765432109",
     salesPerson: "priya",
-    brand: "EcoShield",
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
     xFactory: true,
     forDelivery: false,
     transport: false,
@@ -105,19 +106,20 @@ export const mockOrders = [
       }
     ]
   },
-  
+
   {
     id: "ORD-2024-003",
     status: "Processing",
     date: "2024-01-20",
     createdAt: "2024-01-20T08:45:00.000Z",
     updatedAt: "2024-01-20T08:45:00.000Z",
-    
+
     customerName: "Metro Infrastructure Pvt Ltd",
     customerAddress: "Tower B, 4th Floor, Business Park, Noida Extension, Uttar Pradesh - 201301",
     customerWhatsapp: "+91 7654321098",
     salesPerson: "amit",
-    brand: "IndustrialMax",
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
     xFactory: false,
     forDelivery: false,
     transport: true,
@@ -165,19 +167,20 @@ export const mockOrders = [
       }
     ]
   },
-  
+
   {
     id: "ORD-2024-004",
     status: "Pending",
     date: "2024-01-22",
     createdAt: "2024-01-22T13:20:00.000Z",
     updatedAt: "2024-01-22T13:20:00.000Z",
-    
+
     customerName: "Agricultural Supplies Hub",
     customerAddress: "Village Khairpur, Tehsil Samalkha, District Panipat, Haryana - 132101",
     customerWhatsapp: "+91 6543210987",
     salesPerson: "sunita",
-    brand: "FarmGuard",
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
     xFactory: false,
     forDelivery: true,
     transport: false,
@@ -199,19 +202,20 @@ export const mockOrders = [
       }
     ]
   },
-  
+
   {
     id: "ORD-2024-005",
     status: "In Production",
     date: "2024-01-18",
     createdAt: "2024-01-18T10:00:00.000Z",
     updatedAt: "2024-01-19T12:30:00.000Z",
-    
+
     customerName: "City Event Organizers",
     customerAddress: "Event Plaza, 2nd Floor, Connaught Place, New Delhi - 110001",
     customerWhatsapp: "+91 5432109876",
     salesPerson: "rajesh",
-    brand: "EventPro",
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
     xFactory: true,
     forDelivery: false,
     transport: false,
@@ -246,19 +250,20 @@ export const mockOrders = [
       }
     ]
   },
-  
+
   {
     id: "ORD-2024-006",
     status: "Cancelled",
     date: "2024-01-10",
     createdAt: "2024-01-10T15:30:00.000Z",
     updatedAt: "2024-01-14T09:15:00.000Z",
-    
+
     customerName: "Warehouse Solutions Inc",
     customerAddress: "Logistics Hub, Plot 78, Industrial Estate, Faridabad, Haryana - 121003",
     customerWhatsapp: "+91 4321098765",
     salesPerson: "priya",
-    brand: "StorageMax",
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
     xFactory: false,
     forDelivery: false,
     transport: true,
@@ -293,19 +298,20 @@ export const mockOrders = [
       }
     ]
   },
-  
+
   {
     id: "ORD-2024-007",
     status: "Completed",
     date: "2024-01-08",
     createdAt: "2024-01-08T12:00:00.000Z",
     updatedAt: "2024-01-15T17:20:00.000Z",
-    
+
     customerName: "Marine Dock Services",
     customerAddress: "Berth No. 12, Port Area, JNPT, Navi Mumbai, Maharashtra - 400707",
     customerWhatsapp: "+91 3210987654",
     salesPerson: "amit",
-    brand: "MarinePro",
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
     xFactory: false,
     forDelivery: true,
     transport: false,
@@ -327,19 +333,20 @@ export const mockOrders = [
       }
     ]
   },
-  
+
   {
     id: "ORD-2024-008",
     status: "Processing",
     date: "2024-01-25",
     createdAt: "2024-01-25T14:45:00.000Z",
     updatedAt: "2024-01-25T14:45:00.000Z",
-    
+
     customerName: "Tent House Enterprises",
     customerAddress: "Shop No. 23, Wedding Street, Lajpat Nagar, New Delhi - 110024",
     customerWhatsapp: "+91 2109876543",
     salesPerson: "sunita",
-    brand: "CelebrationMax",
+    //Main Remark
+    mainRemark: "Hello this is the remark you have to take care of ",
     xFactory: true,
     forDelivery: false,
     transport: false,
@@ -381,9 +388,9 @@ export const mockOrders = [
 export const ORDERS_PAGE_STATUSES = ["Pending", "Dispatched", "Completed", "Cancelled"] as const;
 
 export const ALL_ORDER_STATUSES = [
-    ...ORDER_BOOK_STATUSES,
-    "Pending", // from Orders.tsx
-    "Dispatched" // from Orders.tsx
+  ...ORDER_BOOK_STATUSES,
+  "Pending", // from Orders.tsx
+  "Dispatched" // from Orders.tsx
 ] as const;
 // Remove duplicates if any, though for this selection it might be fine
 // A more robust way would be: Array.from(new Set([...ORDER_BOOK_STATUSES, "Pending", "Dispatched"]))

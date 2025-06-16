@@ -24,7 +24,8 @@ const AddOrderForm = ({
     forDelivery: false,
     transport: false,
     transportName: "",
-    transportContact: ""
+    transportContact: "",
+    mainRemark: "",
   });
 
   const [items, setItems] = useState<any[]>([]);
@@ -53,7 +54,7 @@ const AddOrderForm = ({
 
   const handleDeliveryChange = (selectedField: string, checked: boolean | "indeterminate") => {
     const isChecked = checked === true;
-    
+
     if (isChecked) {
       // If checking a box, uncheck all others
       setFormData(prev => ({
@@ -288,7 +289,7 @@ const AddOrderForm = ({
         <div className="border rounded-lg p-6 bg-gray-50">
           <h3 className="text-lg font-semibold mb-4 text-gray-700">Transport Details</h3>
           <div className="flex justify-between gap-6">
-           <div className="w-1/2">
+            <div className="w-1/2">
               <Label htmlFor="transportName" className="text-sm font-medium text-gray-600">Transport Name</Label>
               <Input
                 id="transportName"
@@ -309,6 +310,17 @@ const AddOrderForm = ({
               />
             </div>
           </div>
+        </div>
+        {/* Main Details */}
+        <div className="border rounded-lg p-6 bg-gray-50">
+          <Label className="text-sm font-medium text-gray-600">Remarks</Label>
+          <Textarea
+            value={formData.mainRemark}
+            onChange={(e) => handleItemInputChange("mainRemark", e.target.value)}
+            placeholder="Enter any remarks or special instructions"
+            rows={3}
+            className="mt-1"
+          />
         </div>
       </div>
 

@@ -18,6 +18,7 @@ import CreateShipmentPage from "./pages/CreateShipmentPage";
 import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import OrderListsPage from "./pages/OrderLists";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/orders" element={<Orders />} />
           <Route path="/orderbook" element={<OrderBook />} />
           <Route path="/orderbook/:orderId" element={<OrderDetailsPage />} />
+          <Route path="/order/:orderId/lists" element={<OrderListsPage />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/inventory/add-raw-material" element={<AddRawMaterialPage />} /> {/* New route */}
           <Route path="/inventory/add-finished-product" element={<AddFinishedProductPage />} /> {/* New route */}

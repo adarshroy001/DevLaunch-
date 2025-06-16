@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { orderBookMockOrders, ORDER_BOOK_STATUSES } from "@/data/orderBookMockData";
+import {  ORDER_BOOK_STATUSES, mockOrders } from "@/data/orderBookMockData";
 import type { OrderBookEntry } from "@/types";
 import { ArrowLeft, Edit, Plus, Printer, Save, Trash2, Share2 } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog";
@@ -29,7 +29,7 @@ const OrderDetailsPage = () => {
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [itemFormData, setItemFormData] = useState({
-    ProductName: "",
+    itemName: "",
     gsm: "",
     colourTop: "",
     colourBottom: "",
@@ -43,19 +43,23 @@ const OrderDetailsPage = () => {
   // Update items section starts here 
 
 
-  useEffect(() => {
-    const foundOrder = orderBookMockOrders.find(o => o.id === orderId);
-    if (foundOrder) {
-      setOrder(foundOrder);
-
-      setCurrentStatus(foundOrder.status);
-      setCurrentItems(foundOrder.items);
-    } else {
-      // Handle order not found, e.g., navigate to a 404 page or show error
-      toast({ title: "Error", description: "Order not found.", variant: "destructive" });
-      navigate("/orderbook");
-    }
-  }, [orderId, navigate]);
+useEffect(() => {
+  const foundOrder = mockOrders.find(o => o.id === orderId);
+  if (foundOrder) {
+    // Type assertion to tell TypeScript this matches OrderBookEntry
+    setOrder(foundOrder as OrderBookEntry);
+    
+    setCurrentStatus(foundOrder.status);
+    // Fix: items is an array, not a string
+    setItems(foundOrder.items || []);
+    
+    // If you need currentItems as a string, you might want to do something like:
+    // setCurrentItems(JSON.stringify(foundOrder.items));
+  } else {
+    toast({ title: "Error", description: "Order not found.", variant: "destructive" });
+    navigate("/orderbook");
+  }
+}, [orderId, navigate]);
 
   const handlePrint = () => {
     window.print();
@@ -65,7 +69,7 @@ const OrderDetailsPage = () => {
     if (order) {
       // In a real app, this would be an API call
       // For now, update local state of this page and show toast
-      setOrder(prev => prev ? { ...prev, status: currentStatus } : null);
+      // setOrder(prev => prev ? { ...prev, status: currentStatus } : null);
       toast({ title: "Status Updated", description: `Order ${order.id} status changed to ${currentStatus}.` });
     }
   };
@@ -92,7 +96,7 @@ const OrderDetailsPage = () => {
 
   const resetItemForm = () => {
     setItemFormData({
-      ProductName: "",
+      itemName: "",
       gsm: "",
       colourTop: "",
       colourBottom: "",
@@ -162,7 +166,7 @@ const OrderDetailsPage = () => {
                 </Button>
               </div>
             </div>
-            <CardDescription>Customer: {order.customer} | Date: {order.date}</CardDescription>
+            <CardDescription>Customer: {order.customerName} | Date: {order.date}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -173,20 +177,20 @@ const OrderDetailsPage = () => {
             </div>
             <div className="flex justify-between">
               <div>
-                <Label>Product Details</Label>
-                <p>{order.items}</p>
+                <Label>Total Items</Label>
+                <p className="mx-2">{order.items.length}</p>
               </div>
               <div>
                 <td className="pr-8 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link to={``} className="text-blue-600 hover:text-blue-900">
-                    View
+                  <Link to={`/order/${order.id}/lists`} className="text-blue-600 hover:text-blue-900">
+                    View all Items
                   </Link>
                 </td>
               </div>
             </div>
             <div className="flex gap-2">
               <Label className="p-0 mt-1">Remark</Label>
-              <p className="p-0 m-0">''Note we have to add remark here''</p>
+              <p className="p-0 m-0">{order.mainRemark}</p>
             </div>
           </CardContent>
         </Card>
@@ -240,7 +244,7 @@ const OrderDetailsPage = () => {
                     <div key={index} className="flex items-center justify-between p-4 bg-white border rounded-lg">
                       <div className="flex-1">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                          <div><span className="font-medium">Item:</span> {item.ProductName}</div>
+                          <div><span className="font-medium">Item:</span> {item.itemName}</div>
                           <div><span className="font-medium">GSM:</span> {item.gsm}</div>
                           <div><span className="font-medium">Width:</span> {item.width}in</div>
                           <div><span className="font-medium">Qty:</span> {item.quantity}</div>
@@ -301,8 +305,8 @@ const OrderDetailsPage = () => {
                             <Input
                               id="rollName"
                               placeholder="e.g., Heavy Duty Tarpaulin Blue"
-                              value={itemFormData.ProductName}
-                              onChange={(e) => handleItemInputChange("ProductName", e.target.value)}
+                              value={itemFormData.itemName}
+                              onChange={(e) => handleItemInputChange("itemName", e.target.value)}
                             />
                           </div>
                           <div>
@@ -413,8 +417,8 @@ const OrderDetailsPage = () => {
                             <Input
                               id="bundleName"
                               placeholder="e.g., Standard Tarpaulin Pack"
-                              value={itemFormData.ProductName}
-                              onChange={(e) => handleItemInputChange("ProductName", e.target.value)}
+                              value={itemFormData.itemName}
+                              onChange={(e) => handleItemInputChange("itemName", e.target.value)}
                             />
                           </div>
                           <div>
