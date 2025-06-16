@@ -20,7 +20,6 @@ const AddOrderForm = ({
     customerAddress: "",
     customerWhatsapp: "",
     salesPerson: "",
-    brand: "",
     xFactory: false,
     forDelivery: false,
     transport: false,

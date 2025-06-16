@@ -24,6 +24,7 @@ import {
   getPendingOrders,
   getCancelledOrders,
 } from "@/api/order";
+import { mockOrders } from "@/data/orderBookMockData";
 
 const Orders = () => {
   const [filter, setFilter] = useState("all");
@@ -78,7 +79,8 @@ const Orders = () => {
       }
 
       if (response.success) {
-        setOrders(response.data.orders);
+        // setOrders(response.data.orders);
+        setOrders(mockOrders);
         setPagination(response.data.pagination);
       } else {
         throw new Error(response.message || "Failed to fetch orders");
@@ -222,11 +224,10 @@ const Orders = () => {
             <div className="flex flex-col sm:flex-row justify-between gap-4">
               <div className="flex space-x-4">
                 <button
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    filter === "all"
+                  className={`px-3 py-1.5 text-sm rounded-md ${filter === "all"
                       ? "bg-blue-50 text-blue-700"
                       : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                    }`}
                   onClick={() => setFilter("all")}
                 >
                   All Orders
@@ -293,9 +294,9 @@ const Orders = () => {
                   </TableRow>
                 ) : (
                   orders.map((order) => (
-                    <TableRow key={order.orderId}>
-                      <TableCell className="font-medium text-blue-600">
-                        {order.orderId}
+                    <TableRow key={order.id}>
+                      <TableCell className="font-medium text-blue-600 min-w-40">
+                        {order.id}
                       </TableCell>
                       <TableCell>
                         {order.customerName ||
@@ -305,14 +306,13 @@ const Orders = () => {
                       <TableCell>
                         {order.product ||
                           order.items
-                            ?.map((item: any) => item.product?.name)
-                            .join(", ") ||
+                          ? order.items[0].itemName :
                           "N/A"}
                       </TableCell>
                       <TableCell className="pl-10">
                         {order.quantity ||
                           order.items?.reduce(
-                            (sum: number, item: any) => sum + item.quantity,
+                            (sum: number, item: any) => sum + Number(item.quantity),
                             0
                           )}
                       </TableCell>
@@ -325,7 +325,7 @@ const Orders = () => {
                       </TableCell>
                       <TableCell>
                         <Link
-                          to={`/orderbook/${order.orderId}`}
+                          to={`/orderbook/${order.id}`}
                           className="text-blue-600 hover:text-blue-900 text-center px-4"
                         >
                           View

@@ -14,6 +14,7 @@ import {
   searchInventory,
 } from "@/api/inventory";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 
 const StockStatusBadge = ({ status }: { status: string }) => {
   const getStatusStyles = () => {
@@ -217,9 +218,9 @@ const Inventory = () => {
     loadInventory();
   };
 
-  // Handle search
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
+  // Handle search - FIXED: Proper function reference
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
     loadInventory();
   };
 
@@ -367,7 +368,8 @@ const Inventory = () => {
                 className="w-full bg-amber-600 text-white hover:bg-amber-700"
                 onClick={() => navigate("/inventory/low-stock-alerts")}
               >
-                View All Alerts ({summary.lowStockItems})
+                Low Stock Alerts 
+                {/* ({summary.lowStockItems}) */}
               </Button>
             </div>
           </div>
@@ -409,13 +411,18 @@ const Inventory = () => {
                 </button>
               </div>
               <div className="w-full sm:w-auto">
-                <SearchBar
-                  placeholder="Search inventory..."
-                  className="w-full sm:w-64"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onSearch={() => handleSearch(searchQuery)}
-                />
+                <form onSubmit={handleSearch} className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Search inventory..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full sm:w-64"
+                  />
+                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                    Search
+                  </Button>
+                </form>
               </div>
             </div>
           </div>
