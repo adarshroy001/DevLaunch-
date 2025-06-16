@@ -49,31 +49,23 @@ const OrderListsPage = () => {
                 </Button>
 
                 <Card className="mb-6">
-                    <CardHeader className="mb-1 pb-3">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <CardTitle className="text-xl">Order ID: {order.id}</CardTitle>
-                                <CardDescription className="mt-1">Customer: {order.customerName} | Date: {order.date}</CardDescription>
-                            </div>
-                            <OrderStatusBadge status={order.status} />
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label className="text-sm font-medium text-gray-700">Total Items:</Label>
-                                <span className="ml-2 text-sm">{order.items.length}</span>
-                            </div>
-                            {order.mainRemark && (
-                                <div>
-                                    <Label className="text-sm font-medium text-gray-700">Remark:</Label>
-                                    <span className="ml-2 text-sm">{order.mainRemark}</span>
-                                </div>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-lg">Order Context</CardTitle>
+                        <div className="flex justify-between flex-wrap">
+                        <CardDescription>
+                            Order ID: {order.id} | Customer: {order.customerName} | Date: {order.date}
+                        </CardDescription>
 
+                        <CardDescription>
+                        <OrderStatusBadge status={order.status} />
+                        </CardDescription>
+
+                        </div>
+                        <CardDescription>
+                            Remarks: {order.mainRemark}
+                        </CardDescription>
+                    </CardHeader>
+                </Card>
                 {/* Items List */}
                 <Card>
                     <CardHeader>
@@ -92,7 +84,7 @@ const OrderListsPage = () => {
                                         <div className="flex justify-between items-start mb-3">
                                             <h3 className="font-semibold text-gray-900">{item.itemName}</h3>
                                             <Link 
-                                                to={``} 
+                                                to={`/orders/${order.id}/items/${item.id}`} 
                                                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                                             >
                                                 View details

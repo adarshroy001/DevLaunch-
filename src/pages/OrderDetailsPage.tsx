@@ -8,21 +8,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import {  ORDER_BOOK_STATUSES, mockOrders } from "@/data/orderBookMockData";
+import { ORDER_BOOK_STATUSES, mockOrders } from "@/data/orderBookMockData";
 import type { OrderBookEntry } from "@/types";
 import { ArrowLeft, Edit, Plus, Printer, Save, Trash2, Share2 } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { log } from "console";
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
 
   const [order, setOrder] = useState<OrderBookEntry | null>(null);
-  const [currentStatus, setCurrentStatus] = useState<string>("");
-  const [currentItems, setCurrentItems] = useState<string>("");
 
   // Update items section starts here 
   const [items, setItems] = useState<any[]>([]);
@@ -42,35 +41,34 @@ const OrderDetailsPage = () => {
   });
   // Update items section starts here 
 
-
-useEffect(() => {
-  const foundOrder = mockOrders.find(o => o.id === orderId);
-  if (foundOrder) {
-    // Type assertion to tell TypeScript this matches OrderBookEntry
-    setOrder(foundOrder as OrderBookEntry);
-    
-    setCurrentStatus(foundOrder.status);
-    // Fix: items is an array, not a string
-    setItems(foundOrder.items || []);
-    
-    // If you need currentItems as a string, you might want to do something like:
-    // setCurrentItems(JSON.stringify(foundOrder.items));
-  } else {
-    toast({ title: "Error", description: "Order not found.", variant: "destructive" });
-    navigate("/orderbook");
-  }
-}, [orderId, navigate]);
+  useEffect(() => {
+    const foundOrder = mockOrders.find(o => o.id === orderId);
+    if (foundOrder) {
+      setOrder(foundOrder as OrderBookEntry);
+      // Fix: items is an array, not a string
+      setItems(foundOrder.items || []);
+    } else {
+      toast({ title: "Error", description: "Order not found.", variant: "destructive" });
+      navigate("/orderbook");
+    }
+  }, [orderId, navigate]);
 
   const handlePrint = () => {
     window.print();
   };
 
+  const handleStatusChange = (newStatus: string) => {
+    if (order) {
+      // Update the order object with the new status
+      // setOrder(prev => prev ? { ...prev, status: newStatus } : null);
+    }
+  };
+
   const handleStatusUpdate = () => {
     if (order) {
-      // In a real app, this would be an API call
-      // For now, update local state of this page and show toast
-      // setOrder(prev => prev ? { ...prev, status: currentStatus } : null);
-      toast({ title: "Status Updated", description: `Order ${order.id} status changed to ${currentStatus}.` });
+      // In a real app, this would be an API call to update the backend
+      // For now, just show toast confirmation
+      toast({ title: "Status Updated", description: `Order ${order.id} status changed to ${order.status}.` });
     }
   };
 
@@ -199,9 +197,9 @@ useEffect(() => {
           <Card>
             <CardContent className="flex flex-wrap justify-between mt-6">
               <h3 className="text-lg md:text-2xl font-semibold ">Update Status</h3>
-              <div className="flex">
-                <Select value={currentStatus} onValueChange={setCurrentStatus}>
-                  <SelectTrigger id="status-update">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Select value={order.status} onValueChange={handleStatusChange}>
+                  <SelectTrigger className="min-w-[200px] border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="Select new status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -212,12 +210,14 @@ useEffect(() => {
                     ))}
                   </SelectContent>
                 </Select>
-                <CardFooter>
-                  <Button onClick={handleStatusUpdate}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Status
-                  </Button>
-                </CardFooter>
+
+                <Button
+                  onClick={handleStatusUpdate}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Status
+                </Button>
               </div>
             </CardContent>
             {/* Update Items */}
@@ -227,7 +227,7 @@ useEffect(() => {
                 <Button
                   type="button"
                   onClick={handleAddItem}
-                  className=" text-white px-3 py-1 text-sm"
+                  className=" text-white px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700"
                 >
                   <Plus className="w-4 h-4 mr-1" />
                   Add Item
@@ -554,6 +554,7 @@ useEffect(() => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            {/* Buttons */}
             <div className="flex gap-2 justify-center mb-6 mt-2">
               <Button className="bg-blue-600 hover:bg-blue-700">
                 Discard Changes
