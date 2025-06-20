@@ -305,27 +305,27 @@ const Orders = () => {
                       </TableCell>
                       <TableCell>
                         {order.product ||
-                          order.items
-                          ? order.items[0].itemName :
-                          "N/A"}
+                          (order.items && order.items.length > 0
+                            ? order.items[0].itemName
+                            : "N/A")}
                       </TableCell>
                       <TableCell className="pl-10">
                         {order.quantity ||
-                          order.items?.reduce(
-                            (sum: number, item: any) => sum + Number(item.quantity),
+                          (order.items?.reduce(
+                            (sum: number, item: any) => sum + Number(item.quantity || 0),
                             0
-                          )}
+                          ) || 0)}
                       </TableCell>
                       <TableCell className="text-gray-500">
                         {order.date ||
-                          new Date(order.createdAt).toLocaleDateString()}
+                          (order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A")}
                       </TableCell>
                       <TableCell>
                         <OrderStatusBadge status={order.status} />
                       </TableCell>
                       <TableCell>
                         <Link
-                          to={`/orderbook/${order.id}`}
+                          to={`/order/${order.id}`}
                           className="text-blue-600 hover:text-blue-900 text-center px-4"
                         >
                           View

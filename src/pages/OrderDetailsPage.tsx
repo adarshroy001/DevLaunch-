@@ -250,8 +250,7 @@ const OrderDetailsPage = () => {
                           <div><span className="font-medium">Qty:</span> {item.quantity}</div>
                           <div><span className="font-medium">Top Color:</span> {item.colourTop}</div>
                           <div><span className="font-medium">Bottom Color:</span> {item.colourBottom}</div>
-                          <div><span className="font-medium">Weight:</span> {item.weight}Kg</div>
-                          {item.remarks && <div><span className="font-medium">Remarks:</span> {item.remarks}</div>}
+                          {item.remarks && <div className="col-span-2"><span className="font-medium">Remarks:</span> {item.remarks}</div>}
                         </div>
                       </div>
                       <div className="flex gap-2 ml-4">

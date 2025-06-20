@@ -46,5 +46,6 @@ export interface OrderItem {
   quantity: string;
   unit: string;
   pcsPerUnit: string;
+  varient: string;
   remarks: string;
 }

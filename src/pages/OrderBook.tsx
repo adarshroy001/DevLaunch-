@@ -245,7 +245,7 @@ const OrderBook = () => {
                       </td>
                       <td className="pr-8 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
-                          to={`/orderbook/${order.orderId}`}
+                          to={`/order/${order.orderId}`}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           View

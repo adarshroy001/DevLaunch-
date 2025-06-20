@@ -1,7 +1,7 @@
 
 import type { OrderBookEntry } from "@/types";
 
-export const ORDER_BOOK_STATUSES = ["Processing", "Shipped", "Completed", "Delayed", "Cancelled"] as const;
+export const ORDER_BOOK_STATUSES = ["Processing", "Shipped", "Completed", "Delayed", "Cancelled","In Production"] as const;
 
 // export const orderBookMockOrders: OrderBookEntry[] = [
 //   { id: "ORD123", customer: "Construction Co. Ltd", date: "2025-05-20", status: "Processing", total: "₹24,600", items: "Heavy Duty Tarpaulin 20x30" },
@@ -54,6 +54,7 @@ export const mockOrders = [
         quantity: "5",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "Extra reinforcement on edges required"
       },
       {
@@ -67,6 +68,7 @@ export const mockOrders = [
         quantity: "10",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "UV resistant coating needed"
       }
     ]
@@ -102,6 +104,7 @@ export const mockOrders = [
         quantity: "8",
         unit: "pieces",
         pcsPerUnit: "2",
+        varient: 'Regular',
         remarks: "Crop protection grade material"
       }
     ]
@@ -137,6 +140,7 @@ export const mockOrders = [
         quantity: "15",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "Fire retardant coating essential"
       },
       {
@@ -150,6 +154,7 @@ export const mockOrders = [
         quantity: "20",
         unit: "pieces",
         pcsPerUnit: "3",
+        varient: 'Regular',
         remarks: "Easy installation eyelets required"
       },
       {
@@ -163,6 +168,7 @@ export const mockOrders = [
         quantity: "25",
         unit: "rolls",
         pcsPerUnit: "5",
+        varient: 'Regular',
         remarks: "High visibility safety grade"
       }
     ]
@@ -198,6 +204,7 @@ export const mockOrders = [
         quantity: "3",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "UV stabilized, 90% light transmission"
       }
     ]
@@ -233,6 +240,7 @@ export const mockOrders = [
         quantity: "12",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "Flame retardant, attractive finish"
       },
       {
@@ -246,6 +254,7 @@ export const mockOrders = [
         quantity: "6",
         unit: "pieces",
         pcsPerUnit: "2",
+        varient: 'Regular',
         remarks: "Wrinkle resistant, professional grade"
       }
     ]
@@ -281,6 +290,7 @@ export const mockOrders = [
         quantity: "2",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "Insulated, condensation resistant"
       },
       {
@@ -294,6 +304,7 @@ export const mockOrders = [
         quantity: "50",
         unit: "pieces",
         pcsPerUnit: "10",
+        varient: 'Regular',
         remarks: "Shrink-wrap compatible edges"
       }
     ]
@@ -329,6 +340,7 @@ export const mockOrders = [
         quantity: "7",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "Salt water resistant, marine grade grommets"
       }
     ]
@@ -364,6 +376,7 @@ export const mockOrders = [
         quantity: "4",
         unit: "pieces",
         pcsPerUnit: "1",
+        varient: 'Regular',
         remarks: "Decorative border, premium finish"
       },
       {
@@ -377,6 +390,7 @@ export const mockOrders = [
         quantity: "30",
         unit: "pieces",
         pcsPerUnit: "5",
+        varient: 'Regular',
         remarks: "Transparent window sections"
       }
     ]

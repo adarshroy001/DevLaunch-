@@ -341,13 +341,13 @@ const Dispatch = () => {
                   </Link>
                 </div>
                 <div className="w-full sm:w-auto">
-                  <SearchBar
+                  {/* <SearchBar
                     placeholder="Search shipments..."
                     className="w-full sm:w-64"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onSearch={() => handleSearch(searchQuery)}
-                  />
+                  /> */}
                 </div>
               </div>
             </div>
